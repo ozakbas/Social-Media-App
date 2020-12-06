@@ -21,7 +21,6 @@ export default function PostScreen({ navigation }) {
   const [image, setimage] = React.useState("");
 
   const getData = async () => {
-    console.log("getdata workin");
     try {
       const value = await AsyncStorage.getItem("@logged_in_email");
       setemail(value);
@@ -60,7 +59,7 @@ export default function PostScreen({ navigation }) {
     console.log(topics);
     console.log(location);
 
-    fetch("http://192.168.1.30:3000/mobile/addPost", req)
+    fetch("http://192.168.1.25:3000/mobile/addPost", req)
       .then((response) => response.text())
       .then((result) => {
         console.log(result);

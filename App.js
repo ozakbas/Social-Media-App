@@ -16,7 +16,7 @@ import Tabs from "./Tabs";
 
 const Stack = createStackNavigator();
 
-export default function App({ navigation }) {
+export default function App() {
   const [state, dispatch] = React.useReducer(
     (prevState, action) => {
       switch (action.type) {

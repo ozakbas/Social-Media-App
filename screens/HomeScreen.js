@@ -32,7 +32,7 @@ export default function HomeScreen() {
       }),
     };
 
-    fetch("http://192.168.1.30:3000/mobile/getNewsfeed", req)
+    fetch("http://192.168.1.25:3000/mobile/getNewsfeed", req)
       .then((response) => response.text())
       .then((result) => JSON.parse(result))
       .then((result) => {
@@ -92,7 +92,7 @@ export default function HomeScreen() {
         {item.image != "" ? (
           <Image
             source={{
-              uri: `http://192.168.1.30:3000/${item.image}`,
+              uri: `http://192.168.1.25:3000/${item.image}`,
             }}
             style={{ width: 300, height: 300, alignSelf: "center" }}
           />
