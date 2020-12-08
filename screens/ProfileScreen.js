@@ -11,6 +11,7 @@ import {
   TextInput,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Icon from "react-native-vector-icons/Ionicons";
 
 export default function ProfileScreen({ navigation }) {
   const [username, setUsername] = useState("");
@@ -36,6 +37,47 @@ export default function ProfileScreen({ navigation }) {
   const [addConnection, setAddConnection] = useState("");
   const [addTopic, setAddTopic] = useState("");
   const [addLocation, setAddLocation] = useState("");
+
+  function like(email, post_id) {
+    setRefresh(true);
+    var req = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: email,
+        postId: post_id,
+      }),
+    };
+
+    fetch("http://192.168.1.25:3000/mobile/like", req)
+      .then((response) => response.text())
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((error) => console.log("error", error));
+  }
+  function dislike(email, post_id) {
+    setRefresh(true);
+    var req = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: email,
+        postId: post_id,
+      }),
+    };
+
+    fetch("http://192.168.1.25:3000/mobile/dislike", req)
+      .then((response) => response.text())
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((error) => console.log("error", error));
+  }
 
   function submitConnection() {
     setModalVisibility(false);
@@ -87,7 +129,7 @@ export default function ProfileScreen({ navigation }) {
   }
 
   function deletePost(post_id) {
-    console.log(post_id);
+    setRefresh(true);
 
     var req = {
       method: "POST",
@@ -213,6 +255,23 @@ export default function ProfileScreen({ navigation }) {
       .catch((error) => console.log("error", error));
   }
 
+  function getPosts(id) {
+    var req = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id: id }),
+    };
+
+    fetch(`http://192.168.1.25:3000/mobile/showMyPosts`, req)
+      .then((response) => response.text())
+      .then((result) => JSON.parse(result))
+      .then((result) => {
+        setPosts(result.posts.reverse());
+      })
+      .catch((error) => console.log("error", error));
+  }
   function getUserInfo(email) {
     var data = {
       email: email,
@@ -236,11 +295,11 @@ export default function ProfileScreen({ navigation }) {
       .then((result) => JSON.parse(result))
       .then((result) => {
         setUsername(result.user.username);
-        setPosts(result.user.posts.reverse());
         setProfileImage(result.user.profileImage);
         setConnections(result.user.friends);
-        setTopics(result.user.topics);
         setLocations(result.user.locations);
+        setTopics(result.user.topics);
+        getPosts(result.user._id);
       })
       .catch((error) => console.log("error", error));
   }
@@ -267,6 +326,9 @@ export default function ProfileScreen({ navigation }) {
 
   const Bio = () => (
     <View style={{ margin: 10 }}>
+      <TouchableOpacity onPress={() => setRefresh(true)}>
+        <Text>🔄</Text>
+      </TouchableOpacity>
       <Text style={styles.username}>{username}</Text>
       <View
         style={{
@@ -322,6 +384,7 @@ export default function ProfileScreen({ navigation }) {
       </View>
     </View>
   );
+
   const Item = ({ item }) => (
     <View style={styles.itemView}>
       <View style={{ flexDirection: "row" }}>
@@ -347,10 +410,57 @@ export default function ProfileScreen({ navigation }) {
         )}
       </View>
       <Text>{item.topics}</Text>
-      <View style={{ flexDirection: "row" }}>
-        <Text style={{ fontSize: 18, margin: 5 }}>45👍</Text>
-        <Text style={{ fontSize: 18, margin: 5 }}>5👎</Text>
-        <Text style={{ fontSize: 18, margin: 5 }}>7💬</Text>
+      <View style={{ flexDirection: "row", margin: 10 }}>
+        {Array.isArray(item.likes) && (
+          <Text style={styles.title}>{JSON.stringify(item.likes.length)}</Text>
+        )}
+        <TouchableOpacity
+          style={{
+            backgroundColor: "lightgrey",
+            alignSelf: "center",
+          }}
+          onPress={() => like(email, item._id)}
+        >
+          <Icon
+            name="md-thumbs-up"
+            color={"purple"}
+            size={26}
+            style={{
+              marginRight: 10,
+            }}
+          />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            backgroundColor: "lightgrey",
+            alignSelf: "center",
+          }}
+          onPress={() => dislike(email, item._id)}
+        >
+          <Icon name="md-thumbs-down" color={"purple"} size={26} />
+        </TouchableOpacity>
+        {Array.isArray(item.likes) && (
+          <Text style={styles.title}>
+            {JSON.stringify(item.dislikes.length)}
+          </Text>
+        )}
+        <TouchableOpacity
+          style={{
+            backgroundColor: "lightgrey",
+            alignSelf: "center",
+          }}
+          onPress={() => console.log(email, item._id)}
+        >
+          <Icon
+            name="md-text"
+            color={"purple"}
+            size={26}
+            style={{
+              marginLeft: 30,
+            }}
+          />
+        </TouchableOpacity>
+
         <TouchableOpacity
           onPress={() => deletePost(item._id)}
           style={{ alignSelf: "flex-end", flex: 1 }}
@@ -458,7 +568,6 @@ export default function ProfileScreen({ navigation }) {
           keyExtractor={(item) => item._id}
         />
       </Modal>
-
       <Modal visible={ModalVisibility3} animationType="slide">
         <TouchableOpacity
           style={{

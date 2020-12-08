@@ -50,14 +50,9 @@ export default function PostScreen({ navigation }) {
         caption: caption,
         topics: topics,
         location: location,
-        //image: image,
+        // image: image,
       }),
     };
-
-    console.log(email);
-    console.log(caption);
-    console.log(topics);
-    console.log(location);
 
     fetch("http://192.168.1.25:3000/mobile/addPost", req)
       .then((response) => response.text())
@@ -72,7 +67,7 @@ export default function PostScreen({ navigation }) {
   const askForPermission = async () => {
     const permissionResult = await Permissions.askAsync(Permissions.CAMERA);
     if (permissionResult.status !== "granted") {
-      Alert.alert("no permissions to access camera!", [{ text: "ok" }]);
+      Alert.alert(" No permissions to access camera", [{ text: "ok" }]);
       return false;
     }
     return true;
@@ -89,11 +84,22 @@ export default function PostScreen({ navigation }) {
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
         aspect: [3, 3],
-        quality: 1,
+        quality: 0.3,
         base64: true,
       });
       // make sure a image was taken:
       if (!img.cancelled) {
+        const data = new FormData();
+        data.append("name", "avatar");
+        data.append("fileData", {
+          uri: img.uri,
+          type: img.type,
+          name: img.fileName,
+        });
+        console.log(data.uri);
+        console.log(data.type);
+        console.log(data.name);
+
         setimage(JSON.stringify(img.base64));
       }
     }
