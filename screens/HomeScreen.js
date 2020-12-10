@@ -13,10 +13,11 @@ import { AuthContext } from "../context/auth-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "react-native-vector-icons/Ionicons";
 
-export default function HomeScreen() {
+export default function HomeScreen({ navigation }) {
   const { signOut } = React.useContext(AuthContext);
 
   const [username, setUsername] = useState("");
+  const [id, setId] = useState("");
   const [email, setEmail] = useState("");
   const [posts, setPosts] = useState([]);
 
@@ -84,12 +85,40 @@ export default function HomeScreen() {
       .catch((error) => console.log("error", error));
   }
 
+  function getUserInfo(email) {
+    var data = {
+      email: email,
+    };
+
+    var req = {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      email: email,
+    };
+
+    fetch(
+      `http://192.168.1.25:3000/user/mobile/email/${encodeURIComponent(
+        data.email
+      )}`,
+      req
+    )
+      .then((response) => response.text())
+      .then((result) => JSON.parse(result))
+      .then((result) => {
+        setUsername(result.user.username);
+        setId(result.user._id);
+      })
+      .catch((error) => console.log("error", error));
+  }
   const getData = async () => {
     console.log("getdata workin");
     try {
       const value = await AsyncStorage.getItem("@logged_in_email");
       setEmail(value);
       getFeed(value);
+      getUserInfo(value);
 
       if (value !== null) {
         // value previously stored
@@ -102,6 +131,7 @@ export default function HomeScreen() {
 
   useEffect(() => {
     getData();
+
     setRefresh(false);
   }, [refresh]);
 
@@ -175,7 +205,7 @@ export default function HomeScreen() {
             backgroundColor: "lightgrey",
             alignSelf: "center",
           }}
-          onPress={() => console.log(email, item._id)}
+          onPress={() => navigation.navigate("Comment", { item, username, id })}
         >
           <Icon
             name="md-text"

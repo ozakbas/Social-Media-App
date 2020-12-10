@@ -9,20 +9,17 @@ import {
   Modal,
   FlatList,
   TextInput,
+  Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "react-native-vector-icons/Ionicons";
 
 export default function ProfileScreen({ navigation }) {
   const [username, setUsername] = useState("");
+  const [id, setId] = useState("");
   const [email, setEmail] = useState("");
   const [profileImage, setProfileImage] = useState("");
-  const [posts, setPosts] = useState([
-    {
-      id: "bd7acbea-c1b1-46c2-aed5-3ad53abb28ba",
-      title: "You have no posts",
-    },
-  ]);
+  const [posts, setPosts] = useState([]);
 
   const [connections, setConnections] = useState([]);
   const [topics, setTopics] = useState([]);
@@ -31,6 +28,7 @@ export default function ProfileScreen({ navigation }) {
   const [ModalVisibility, setModalVisibility] = useState(false);
   const [ModalVisibility2, setModalVisibility2] = useState(false);
   const [ModalVisibility3, setModalVisibility3] = useState(false);
+  const [CommentsVisibility, setCommentsVisibility] = useState(false);
 
   const [refresh, setRefresh] = useState(false);
 
@@ -127,7 +125,6 @@ export default function ProfileScreen({ navigation }) {
       .catch((error) => console.log("error", error));
     setAddTopic("");
   }
-
   function deletePost(post_id) {
     setRefresh(true);
 
@@ -148,6 +145,22 @@ export default function ProfileScreen({ navigation }) {
         console.log(result);
       })
       .catch((error) => console.log("error", error));
+  }
+
+  function deleteAlert(post_id) {
+    Alert.alert(
+      "Are you sure?",
+      "Your post will be deleted forever if you press OK.",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
+        },
+        { text: "OK", onPress: () => deletePost(post_id) },
+      ],
+      { cancelable: false }
+    );
   }
 
   function deleteTopic(topic) {
@@ -294,6 +307,7 @@ export default function ProfileScreen({ navigation }) {
       .then((response) => response.text())
       .then((result) => JSON.parse(result))
       .then((result) => {
+        setId(result.user._id);
         setUsername(result.user.username);
         setProfileImage(result.user.profileImage);
         setConnections(result.user.friends);
@@ -449,7 +463,7 @@ export default function ProfileScreen({ navigation }) {
             backgroundColor: "lightgrey",
             alignSelf: "center",
           }}
-          onPress={() => console.log(email, item._id)}
+          onPress={() => navigation.navigate("Comment", { item, username, id })}
         >
           <Icon
             name="md-text"
@@ -462,7 +476,7 @@ export default function ProfileScreen({ navigation }) {
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={() => deletePost(item._id)}
+          onPress={() => deleteAlert(item._id)}
           style={{ alignSelf: "flex-end", flex: 1 }}
         >
           <Text style={styles.delete}>delete</Text>
@@ -594,6 +608,57 @@ export default function ProfileScreen({ navigation }) {
               </View>
               <View style={{ alignItems: "center" }}>
                 <Text style={styles.title}>Your locations</Text>
+              </View>
+            </View>
+          }
+          renderItem={({ item }) => (
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                alignSelf: "center",
+              }}
+            >
+              <Text style={styles.greenItem}>{item}</Text>
+              <TouchableOpacity
+                style={styles.deleteItem}
+                onPress={() => deleteLocation(item)}
+              >
+                <Text style={{ color: "red", fontSize: 20, fontWeight: "700" }}>
+                  X
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
+          keyExtractor={(item) => item._id}
+        />
+      </Modal>
+      <Modal visible={CommentsVisibility} animationType="slide">
+        <TouchableOpacity
+          style={{
+            alignContent: "stretch",
+            alignItems: "flex-end",
+          }}
+          onPress={() => setCommentsVisibility(false)}
+        >
+          <Text style={{ fontSize: 20, color: "red", margin: 20 }}>close</Text>
+        </TouchableOpacity>
+
+        <FlatList
+          data={locations}
+          ListHeaderComponent={
+            <View>
+              <View style={{ marginBottom: 40, alignItems: "center" }}>
+                <Text style={styles.title}>Add a comment</Text>
+                <TextInput
+                  style={styles.flatListInput}
+                  onChangeText={(text) => setAddLocation(text)}
+                  value={addLocation}
+                />
+                <Button title="submit" onPress={() => submitLocation()} />
+              </View>
+              <View style={{ alignItems: "center" }}>
+                <Text style={styles.title}>Comments</Text>
               </View>
             </View>
           }

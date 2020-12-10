@@ -1,13 +1,5 @@
 import React from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  Button,
-  Alert,
-  TextInput,
-} from "react-native";
+import { StyleSheet, Text, View, Button, Alert, TextInput } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import * as Permissions from "expo-permissions";
 import { TouchableOpacity } from "react-native-gesture-handler";

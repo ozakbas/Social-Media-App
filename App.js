@@ -11,6 +11,7 @@ import SignUpScreen from "./screens/SignUpScreen";
 import LoadingScreen from "./screens/LoadingScreen";
 import WelcomeScreen from "./screens/WelcomeScreen";
 import PostScreen from "./screens/PostScreen";
+import CommentScreen from "./screens/CommentScreen";
 
 import Tabs from "./Tabs";
 
@@ -169,6 +170,17 @@ export default function App() {
                 component={PostScreen}
                 options={() => ({
                   headerTitle: "Submit a Post",
+                  headerStyle: { backgroundColor: "lightgrey" },
+                  headerTintColor: "#fff",
+                  headerTitleAlign: "center",
+                  headerTitleStyle: { fontSize: 20 },
+                })}
+              />
+              <Stack.Screen
+                name="Comment"
+                component={CommentScreen}
+                options={() => ({
+                  headerTitle: "Comments",
                   headerStyle: { backgroundColor: "lightgrey" },
                   headerTintColor: "#fff",
                   headerTitleAlign: "center",
