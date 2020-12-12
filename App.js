@@ -12,6 +12,7 @@ import LoadingScreen from "./screens/LoadingScreen";
 import WelcomeScreen from "./screens/WelcomeScreen";
 import PostScreen from "./screens/PostScreen";
 import CommentScreen from "./screens/CommentScreen";
+import ConversationScreen from "./screens/ConversationScreen";
 
 import Tabs from "./Tabs";
 
@@ -185,6 +186,17 @@ export default function App() {
                   headerTintColor: "#fff",
                   headerTitleAlign: "center",
                   headerTitleStyle: { fontSize: 20 },
+                })}
+              />
+              <Stack.Screen
+                name="Conversation"
+                component={ConversationScreen}
+                options={() => ({
+                  headerTitle: "Conversation",
+                  headerStyle: { backgroundColor: "#1f65ff" },
+                  headerTintColor: "#fff",
+                  headerTitleAlign: "center",
+                  headerTitleStyle: { fontSize: 25 },
                 })}
               />
             </>

@@ -31,7 +31,7 @@ export default function SignInScreen() {
       body: JSON.stringify(data),
     };
 
-    fetch("http://192.168.1.25:3000/login", req)
+    fetch("http://192.168.1.23:3000/login", req)
       .then((response) => response.text())
       .then((result) => JSON.parse(result))
       .then((result) => {

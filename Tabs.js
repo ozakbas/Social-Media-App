@@ -6,6 +6,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 import HomeScreen from "./screens/HomeScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import ChatScreen from "./screens/ChatScreen";
+import ConversationScreen from "./screens/ConversationScreen";
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -26,7 +27,7 @@ const Tabs = () => (
       name="Chat"
       component={ChatScreen}
       options={{
-        tabBarLabel: "Conversations",
+        tabBarLabel: "Chat",
         tabBarColor: "#1f65ff",
         tabBarIcon: ({ color }) => (
           <Icon name="ios-chatbubbles" color={color} size={26} />

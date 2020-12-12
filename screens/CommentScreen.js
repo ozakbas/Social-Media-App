@@ -31,7 +31,7 @@ export default function CommentScreen({ route, navigation }) {
       }),
     };
 
-    fetch("http://192.168.1.25:3000/mobile/addComment", req)
+    fetch("http://192.168.1.23:3000/mobile/addComment", req)
       .then((response) => response.text())
       .then((result) => {
         console.log(result);

@@ -49,7 +49,7 @@ export default function ProfileScreen({ navigation }) {
       }),
     };
 
-    fetch("http://192.168.1.25:3000/mobile/like", req)
+    fetch("http://192.168.1.23:3000/mobile/like", req)
       .then((response) => response.text())
       .then((result) => {
         console.log(result);
@@ -69,7 +69,7 @@ export default function ProfileScreen({ navigation }) {
       }),
     };
 
-    fetch("http://192.168.1.25:3000/mobile/dislike", req)
+    fetch("http://192.168.1.23:3000/mobile/dislike", req)
       .then((response) => response.text())
       .then((result) => {
         console.log(result);
@@ -93,7 +93,7 @@ export default function ProfileScreen({ navigation }) {
       }),
     };
 
-    fetch("http://192.168.1.25:3000/mobile/addConnection", req)
+    fetch("http://192.168.1.23:3000/mobile/addConnection", req)
       .then((response) => response.text())
       .then((result) => {
         console.log(result);
@@ -117,7 +117,7 @@ export default function ProfileScreen({ navigation }) {
       }),
     };
 
-    fetch("http://192.168.1.25:3000/mobile/subscribeTopic", req)
+    fetch("http://192.168.1.23:3000/mobile/subscribeTopic", req)
       .then((response) => response.text())
       .then((result) => {
         console.log(result);
@@ -139,7 +139,7 @@ export default function ProfileScreen({ navigation }) {
       }),
     };
 
-    fetch("http://192.168.1.25:3000/mobile/deletePost", req)
+    fetch("http://192.168.1.23:3000/mobile/deletePost", req)
       .then((response) => response.text())
       .then((result) => {
         console.log(result);
@@ -177,7 +177,7 @@ export default function ProfileScreen({ navigation }) {
       }),
     };
 
-    fetch("http://192.168.1.25:3000/mobile/unsubscribeTopic", req)
+    fetch("http://192.168.1.23:3000/mobile/unsubscribeTopic", req)
       .then((response) => response.text())
 
       .catch((error) => console.log("error", error));
@@ -196,7 +196,7 @@ export default function ProfileScreen({ navigation }) {
       }),
     };
 
-    fetch("http://192.168.1.25:3000/mobile/unsubscribeLocation", req)
+    fetch("http://192.168.1.23:3000/mobile/unsubscribeLocation", req)
       .then((response) => response.text())
 
       .catch((error) => console.log("error", error));
@@ -216,7 +216,7 @@ export default function ProfileScreen({ navigation }) {
       }),
     };
 
-    fetch("http://192.168.1.25:3000/mobile/deleteConnection", req)
+    fetch("http://192.168.1.23:3000/mobile/deleteConnection", req)
       .then((response) => response.text())
       .catch((error) => console.log("error", error));
   }
@@ -237,7 +237,7 @@ export default function ProfileScreen({ navigation }) {
       }),
     };
 
-    fetch("http://192.168.1.25:3000/mobile/subscribeTopic", req)
+    fetch("http://192.168.1.23:3000/mobile/subscribeTopic", req)
       .then((response) => response.text())
       .then((result) => {
         console.log(result);
@@ -260,7 +260,7 @@ export default function ProfileScreen({ navigation }) {
       }),
     };
 
-    fetch("http://192.168.1.25:3000/mobile/subscribeLocation", req)
+    fetch("http://192.168.1.23:3000/mobile/subscribeLocation", req)
       .then((response) => response.text())
       .then((result) => {
         console.log(result);
@@ -277,7 +277,7 @@ export default function ProfileScreen({ navigation }) {
       body: JSON.stringify({ id: id }),
     };
 
-    fetch(`http://192.168.1.25:3000/mobile/showMyPosts`, req)
+    fetch(`http://192.168.1.23:3000/mobile/showMyPosts`, req)
       .then((response) => response.text())
       .then((result) => JSON.parse(result))
       .then((result) => {
@@ -299,7 +299,7 @@ export default function ProfileScreen({ navigation }) {
     };
 
     fetch(
-      `http://192.168.1.25:3000/user/mobile/email/${encodeURIComponent(
+      `http://192.168.1.23:3000/user/mobile/email/${encodeURIComponent(
         data.email
       )}`,
       req
@@ -353,7 +353,7 @@ export default function ProfileScreen({ navigation }) {
       >
         <Image
           source={{
-            uri: `http://192.168.1.25:3000/${profileImage}`,
+            uri: `http://192.168.1.23:3000/${profileImage}`,
           }}
           style={{ width: 120, height: 120, borderRadius: 40 }}
         />
@@ -415,7 +415,7 @@ export default function ProfileScreen({ navigation }) {
         {item.image != "" ? (
           <Image
             source={{
-              uri: `http://192.168.1.25:3000/${item.image}`,
+              uri: `http://192.168.1.23:3000/${item.image}`,
             }}
             style={{ width: 300, height: 300, alignSelf: "center" }}
           />
