@@ -10,6 +10,7 @@ import {
   TextInput,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default class ChatScreen extends Component {
   constructor(props) {
@@ -82,48 +83,84 @@ export default class ChatScreen extends Component {
 
   componentDidMount() {
     this.getData();
+    this.focusSubscription = this.props.navigation.addListener("focus", () => {
+      this.getData();
+    });
   }
+
   render() {
     return (
       <View>
-        <Text style={styles.title}>Start a new conversation</Text>
-        <View
-          style={{
-            marginTop: 20,
-            marginBottom: 20,
-            margin: 20,
-            flexDirection: "row",
-          }}
-        >
-          <TextInput
-            placeholder="enter the username"
-            style={styles.textInput}
-            value={this.state.person}
-            onChangeText={(person) => this.setState({ person: person })}
-          />
-          <Button title="send" onPress={() => this.createConversation()} />
-        </View>
-        <Text style={styles.title}>Current Conversations</Text>
-
         <FlatList
           data={this.state.conversations}
+          ListHeaderComponent={
+            <View style={{ margin: 10 }}>
+              <Text style={styles.title}>Start a new conversation</Text>
+              <View
+                style={{
+                  marginTop: 20,
+                  marginBottom: 20,
+                  margin: 20,
+                  flexDirection: "row",
+                }}
+              >
+                <TextInput
+                  placeholder="enter the username"
+                  style={styles.textInput}
+                  value={this.state.person}
+                  onChangeText={(person) => this.setState({ person: person })}
+                />
+
+                <View
+                  style={{
+                    margin: 20,
+                    alignItems: "center",
+                    borderRadius: 15,
+                    borderColor: "#B39E8D",
+                    borderWidth: 3,
+                    padding: 5,
+                  }}
+                >
+                  <TouchableOpacity onPress={() => this.createConversation()}>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        fontWeight: "700",
+                        color: "#393939",
+                      }}
+                    >
+                      SEND
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <Text style={styles.title}>Current Conversations</Text>
+            </View>
+          }
           renderItem={({ item }) => (
             <TouchableOpacity
-              style={{
-                flexDirection: "row",
-                backgroundColor: "#f5a140",
-                margin: 15,
-                padding: 15,
-                borderRadius: 10,
-                width: 350,
-              }}
+              style={{ marginHorizontal: 10 }}
               onPress={() =>
                 this.props.navigation.navigate("Conversation", { item })
               }
             >
-              <Text style={{ fontSize: 23, color: "white" }}>
-                {item.person}
-              </Text>
+              <LinearGradient
+                start={[0, 1]}
+                end={[1, 0]}
+                style={{
+                  flexDirection: "row",
+                  backgroundColor: "#f5a140",
+                  margin: 15,
+                  padding: 15,
+                  borderRadius: 10,
+                  width: 340,
+                }}
+                colors={["#fc4a1a", "#fd805e"]}
+              >
+                <Text style={{ fontSize: 23, color: "white" }}>
+                  {item.person}
+                </Text>
+              </LinearGradient>
             </TouchableOpacity>
           )}
           keyExtractor={(item) => JSON.stringify(item.person)}

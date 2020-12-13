@@ -132,6 +132,7 @@ export default function App() {
                   title: "Welcome",
                   // When logging out, a pop animation feels intuitive
                   animationTypeForReplace: state.isSignout ? "pop" : "push",
+                  headerShown: false,
                 }}
               />
               <Stack.Screen
@@ -141,6 +142,7 @@ export default function App() {
                   title: "Sign in",
                   // When logging out, a pop animation feels intuitive
                   animationTypeForReplace: state.isSignout ? "pop" : "push",
+                  headerShown: false,
                 }}
               />
               <Stack.Screen
@@ -150,6 +152,7 @@ export default function App() {
                   title: "Sign up",
                   // When logging out, a pop animation feels intuitive
                   animationTypeForReplace: state.isSignout ? "pop" : "push",
+                  headerShown: false,
                 }}
               />
             </>
@@ -182,7 +185,7 @@ export default function App() {
                 component={CommentScreen}
                 options={() => ({
                   headerTitle: "Comments",
-                  headerStyle: { backgroundColor: "lightgrey" },
+                  headerStyle: { backgroundColor: "#1f65ff" },
                   headerTintColor: "#fff",
                   headerTitleAlign: "center",
                   headerTitleStyle: { fontSize: 20 },

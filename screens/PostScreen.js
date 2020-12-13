@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, Button, Alert, TextInput } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import * as Permissions from "expo-permissions";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { LinearGradient } from "expo-linear-gradient";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function PostScreen({ navigation }) {
@@ -124,14 +125,37 @@ export default function PostScreen({ navigation }) {
             Take a foto
           </Text>
         </TouchableOpacity>
-
-        <Button title="Submit" onPress={() => submitPost()} />
+        <TouchableOpacity style={{ margin: 15 }} onPress={() => submitPost()}>
+          <LinearGradient
+            start={[0, 0.5]}
+            end={[1, 0.5]}
+            colors={["#5f2c82", "#49a09d"]}
+            style={{ borderRadius: 15 }}
+          >
+            <View style={styles.circleGradient}>
+              <Text style={styles.visit}>SUBMIT</Text>
+            </View>
+          </LinearGradient>
+        </TouchableOpacity>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  visit: {
+    margin: 4,
+    padding: 5,
+    textAlign: "center",
+    color: "#393939",
+    fontSize: 20,
+    fontWeight: "700",
+  },
+  circleGradient: {
+    margin: 3,
+    backgroundColor: "#f2f2f2",
+    borderRadius: 10,
+  },
   textInput: {
     fontSize: 18,
     margin: 5,

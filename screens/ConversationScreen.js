@@ -1,8 +1,16 @@
 import React, { Component, useState, useEffect } from "react";
-import { Button, View, Text, StyleSheet, TextInput } from "react-native";
+import {
+  Button,
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+} from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import io from "socket.io-client";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Icon from "react-native-vector-icons/Ionicons";
 
 export default class Conversation extends Component {
   constructor(props) {
@@ -130,13 +138,7 @@ export default class Conversation extends Component {
       <View style={{ flex: 1 }}>
         <View style={{ flex: 1 }}>
           <ScrollView>{chatMessages}</ScrollView>
-          <View
-            style={{
-              flex: 1,
-              justifyContent: "flex-end",
-              marginBottom: 36,
-            }}
-          ></View>
+
           <View style={{ flexDirection: "row", margin: 15 }}>
             <TextInput
               placeholder="enter a message"
@@ -146,11 +148,14 @@ export default class Conversation extends Component {
                 this.setState({ chatMessage });
               }}
             />
-            <Button
-              style={{ flex: 1 }}
-              title="Submit"
+            <TouchableOpacity
+              style={{
+                alignSelf: "center",
+              }}
               onPress={() => this.submitMessage()}
-            />
+            >
+              <Icon name="md-send" color={"blue"} size={40} />
+            </TouchableOpacity>
           </View>
         </View>
       </View>

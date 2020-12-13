@@ -12,6 +12,7 @@ import {
 import { AuthContext } from "../context/auth-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "react-native-vector-icons/Ionicons";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function HomeScreen({ navigation }) {
   const { signOut } = React.useContext(AuthContext);
@@ -135,96 +136,148 @@ export default function HomeScreen({ navigation }) {
     setRefresh(false);
   }, [refresh]);
 
-  const Bio = () => (
-    <View style={{ margin: 10 }}>
-      <Text>Signed in!</Text>
-      <Button title="Sign out" onPress={signOut} />
-    </View>
-  );
+  useEffect(() => {
+    const reRender = navigation.addListener("focus", () => {
+      setRefresh(true);
+    });
+
+    return reRender;
+  }, [navigation]);
+
   const Item = ({ item }) => (
-    <View style={styles.itemView}>
-      <View style={{ flexDirection: "row" }}>
-        <Text style={{ flex: 1, fontSize: 17, textAlign: "left" }}>
-          {username}
-        </Text>
-        <Text style={{ flex: 1, fontSize: 17, textAlign: "right" }}>
-          📍{item.location}
-        </Text>
-      </View>
-
-      <Text style={styles.title}>{item.caption}</Text>
+    <LinearGradient style={styles.itemView} colors={["#2980b9", "#6dd5fa"]}>
       <View>
-        {item.image != "" ? (
-          <Image
-            source={{
-              uri: `http://192.168.1.23:3000/${item.image}`,
-            }}
-            style={{ width: 300, height: 300, alignSelf: "center" }}
-          />
-        ) : (
-          <Text></Text>
-        )}
-      </View>
-      <Text>{item.topics}</Text>
-      <View style={{ flexDirection: "row", margin: 10 }}>
-        {Array.isArray(item.likes) && (
-          <Text style={styles.title}>{JSON.stringify(item.likes.length)}</Text>
-        )}
-        <TouchableOpacity
-          style={{
-            backgroundColor: "lightgrey",
-            alignSelf: "center",
-          }}
-          onPress={() => like(email, item._id)}
-        >
-          <Icon
-            name="md-thumbs-up"
-            color={"purple"}
-            size={26}
+        <View style={{ flexDirection: "row" }}>
+          <Text
             style={{
-              marginRight: 10,
+              flex: 1,
+              fontSize: 19,
+              marginBottom: 10,
+              fontWeight: "700",
+              margin: 10,
+              color: "#fefefe",
             }}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{
-            backgroundColor: "lightgrey",
-            alignSelf: "center",
-          }}
-          onPress={() => dislike(email, item._id)}
-        >
-          <Icon name="md-thumbs-down" color={"purple"} size={26} />
-        </TouchableOpacity>
-        {Array.isArray(item.likes) && (
-          <Text style={styles.title}>
-            {JSON.stringify(item.dislikes.length)}
+          >
+            {username}
           </Text>
-        )}
-        <TouchableOpacity
-          style={{
-            backgroundColor: "lightgrey",
-            alignSelf: "center",
-          }}
-          onPress={() => navigation.navigate("Comment", { item, username, id })}
-        >
-          <Icon
-            name="md-text"
-            color={"purple"}
-            size={26}
+          <Text
             style={{
-              marginLeft: 30,
+              fontSize: 17,
+              marginBottom: 10,
+              fontWeight: "700",
+              margin: 10,
+              color: "#fefefe",
             }}
-          />
-        </TouchableOpacity>
+          >
+            📍{item.location}
+          </Text>
+        </View>
 
-        <TouchableOpacity
-          onPress={() => console.log(item._id)}
-          style={{ alignSelf: "flex-end", flex: 1 }}
+        <Text style={styles.title}>{item.caption}</Text>
+        <View>
+          {item.image != "" ? (
+            <Image
+              source={{
+                uri: `http://192.168.1.23:3000/${item.image}`,
+              }}
+              style={{ width: 300, height: 300, alignSelf: "center" }}
+            />
+          ) : (
+            <Text></Text>
+          )}
+        </View>
+        <Text
+          style={{
+            fontSize: 17,
+            marginBottom: 10,
+            fontWeight: "700",
+            margin: 10,
+          }}
         >
-          <Text style={styles.delete}>report</Text>
-        </TouchableOpacity>
+          {item.topics}
+        </Text>
+        <View style={{ flexDirection: "row", margin: 10 }}>
+          {Array.isArray(item.likes) && (
+            <Text
+              style={{
+                fontSize: 20,
+                marginBottom: 10,
+                fontWeight: "700",
+                margin: 10,
+                color: "#2E875D",
+              }}
+            >
+              {JSON.stringify(item.likes.length)}
+            </Text>
+          )}
+          <TouchableOpacity
+            style={{
+              alignSelf: "center",
+            }}
+            onPress={() => like(email, item._id)}
+          >
+            <Icon
+              name="md-thumbs-up"
+              color={"#2E875D"}
+              size={26}
+              style={{
+                marginRight: 10,
+              }}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              alignSelf: "center",
+            }}
+            onPress={() => dislike(email, item._id)}
+          >
+            <Icon name="md-thumbs-down" color={"#B5493E"} size={26} />
+          </TouchableOpacity>
+          {Array.isArray(item.likes) && (
+            <Text
+              style={{
+                fontSize: 20,
+                marginBottom: 10,
+                fontWeight: "700",
+                margin: 10,
+                color: "#B5493E",
+              }}
+            >
+              {JSON.stringify(item.dislikes.length)}
+            </Text>
+          )}
+          <TouchableOpacity
+            style={{
+              alignSelf: "center",
+            }}
+            onPress={() =>
+              navigation.navigate("Comment", { item, username, id })
+            }
+          >
+            <Icon
+              name="md-text"
+              color={"#f5f5f5"}
+              size={26}
+              style={{
+                marginLeft: 30,
+              }}
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => console.log(item._id)}
+            style={{
+              alignItems: "flex-end",
+              alignSelf: "flex-end",
+              flex: 1,
+              marginLeft: 100,
+            }}
+          >
+            <Text style={{ color: "red", fontWeight: "700" }}>report</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </LinearGradient>
   );
 
   const renderItem = ({ item }) => <Item item={item} />;
@@ -232,7 +285,6 @@ export default function HomeScreen({ navigation }) {
     <View>
       <FlatList
         data={posts}
-        ListHeaderComponent={Bio}
         renderItem={renderItem}
         keyExtractor={(item) => item._id}
       />
@@ -241,6 +293,19 @@ export default function HomeScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+  visit: {
+    margin: 4,
+    padding: 5,
+    textAlign: "center",
+    color: "#393939",
+    fontSize: 20,
+    fontWeight: "700",
+  },
+  circleGradient: {
+    margin: 3,
+    backgroundColor: "#f2f2f2",
+    borderRadius: 10,
+  },
   deleteItem: {
     width: 30,
     height: 30,
@@ -326,5 +391,12 @@ const styles = StyleSheet.create({
     height: 30,
     borderRadius: 50,
     alignItems: "center",
+  },
+  title: {
+    fontSize: 20,
+    marginBottom: 10,
+    fontWeight: "700",
+    margin: 10,
+    color: "#f5f5f5",
   },
 });

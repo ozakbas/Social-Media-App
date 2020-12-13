@@ -17,7 +17,7 @@ const Tabs = () => (
       component={HomeScreen}
       options={{
         tabBarLabel: "Home",
-        tabBarColor: "#009387",
+        tabBarColor: "#e2775e",
         tabBarIcon: ({ color }) => (
           <Icon name="ios-home" color={color} size={26} />
         ),
@@ -39,7 +39,7 @@ const Tabs = () => (
       component={ProfileScreen}
       options={{
         tabBarLabel: "Profile",
-        tabBarColor: "#694fad",
+        tabBarColor: "#B39E8D",
         tabBarIcon: ({ color }) => (
           <Icon name="ios-person" color={color} size={26} />
         ),

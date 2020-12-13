@@ -13,8 +13,13 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "react-native-vector-icons/Ionicons";
+import { LinearGradient } from "expo-linear-gradient";
+
+import { AuthContext } from "../context/auth-context";
 
 export default function ProfileScreen({ navigation }) {
+  const { signOut } = React.useContext(AuthContext);
+
   const [username, setUsername] = useState("");
   const [id, setId] = useState("");
   const [email, setEmail] = useState("");
@@ -56,6 +61,7 @@ export default function ProfileScreen({ navigation }) {
       })
       .catch((error) => console.log("error", error));
   }
+
   function dislike(email, post_id) {
     setRefresh(true);
     var req = {
@@ -125,6 +131,7 @@ export default function ProfileScreen({ navigation }) {
       .catch((error) => console.log("error", error));
     setAddTopic("");
   }
+
   function deletePost(post_id) {
     setRefresh(true);
 
@@ -182,6 +189,7 @@ export default function ProfileScreen({ navigation }) {
 
       .catch((error) => console.log("error", error));
   }
+
   function deleteLocation(location) {
     setRefresh(true);
 
@@ -201,6 +209,7 @@ export default function ProfileScreen({ navigation }) {
 
       .catch((error) => console.log("error", error));
   }
+
   function deleteConnection(connection) {
     setRefresh(true);
     console.log(JSON.stringify(connection));
@@ -244,6 +253,7 @@ export default function ProfileScreen({ navigation }) {
       })
       .catch((error) => console.log("error", error));
   }
+
   function submitLocation() {
     setAddLocation("");
     setModalVisibility3(false);
@@ -285,6 +295,7 @@ export default function ProfileScreen({ navigation }) {
       })
       .catch((error) => console.log("error", error));
   }
+
   function getUserInfo(email) {
     var data = {
       email: email,
@@ -338,12 +349,32 @@ export default function ProfileScreen({ navigation }) {
     setRefresh(false);
   }, [refresh]);
 
+  useEffect(() => {
+    const reRender = navigation.addListener("focus", () => {
+      setRefresh(true);
+    });
+
+    return reRender;
+  }, [navigation]);
+
   const Bio = () => (
     <View style={{ margin: 10 }}>
-      <TouchableOpacity onPress={() => setRefresh(true)}>
-        <Text>🔄</Text>
+      <TouchableOpacity
+        style={{ width: 120, alignSelf: "flex-end" }}
+        onPress={signOut}
+      >
+        <LinearGradient
+          start={[0, 0.5]}
+          end={[1, 0.5]}
+          colors={["#5f2c82", "#49a09d"]}
+          style={{ borderRadius: 15 }}
+        >
+          <View style={styles.circleGradient}>
+            <Text style={styles.visit}>Sign out 👋🏼 </Text>
+          </View>
+        </LinearGradient>
       </TouchableOpacity>
-      <Text style={styles.username}>{username}</Text>
+
       <View
         style={{
           flex: 1,
@@ -357,9 +388,8 @@ export default function ProfileScreen({ navigation }) {
           }}
           style={{ width: 120, height: 120, borderRadius: 40 }}
         />
-        <TouchableOpacity>
-          <Text style={{ textAlign: "center" }}>change profile picture</Text>
-        </TouchableOpacity>
+
+        <Text style={styles.username}>{username}</Text>
       </View>
       <View style={{ flex: 1, flexDirection: "row" }}>
         <TouchableOpacity
@@ -386,103 +416,173 @@ export default function ProfileScreen({ navigation }) {
           <Text>locations</Text>
         </TouchableOpacity>
       </View>
-      <View style={{ margin: 20 }}>
-        <Button
-          title="Create a new post"
-          onPress={() => navigation.navigate("Post")}
-        />
+      <View
+        style={{
+          margin: 20,
+          alignItems: "center",
+          borderRadius: 15,
+          borderColor: "#B39E8D",
+          borderWidth: 3,
+          padding: 5,
+        }}
+      >
+        <TouchableOpacity onPress={() => navigation.navigate("Post")}>
+          <Text style={{ fontSize: 15, fontWeight: "700", color: "#393939" }}>
+            CREATE A NEW POST
+          </Text>
+        </TouchableOpacity>
       </View>
 
       <View style={{ marginTop: 20 }}>
-        <Text style={styles.title}>My Posts</Text>
+        <Text
+          style={{
+            fontSize: 20,
+            marginBottom: 10,
+            fontWeight: "700",
+            color: "#393939",
+            margin: 10,
+          }}
+        >
+          My Posts
+        </Text>
       </View>
     </View>
   );
 
   const Item = ({ item }) => (
-    <View style={styles.itemView}>
-      <View style={{ flexDirection: "row" }}>
-        <Text style={{ flex: 1, fontSize: 17, textAlign: "left" }}>
-          {username}
-        </Text>
-        <Text style={{ flex: 1, fontSize: 17, textAlign: "right" }}>
-          📍{item.location}
-        </Text>
-      </View>
-
-      <Text style={styles.title}>{item.caption}</Text>
+    <LinearGradient style={styles.itemView} colors={["#2980b9", "#6dd5fa"]}>
       <View>
-        {item.image != "" ? (
-          <Image
-            source={{
-              uri: `http://192.168.1.23:3000/${item.image}`,
-            }}
-            style={{ width: 300, height: 300, alignSelf: "center" }}
-          />
-        ) : (
-          <Text></Text>
-        )}
-      </View>
-      <Text>{item.topics}</Text>
-      <View style={{ flexDirection: "row", margin: 10 }}>
-        {Array.isArray(item.likes) && (
-          <Text style={styles.title}>{JSON.stringify(item.likes.length)}</Text>
-        )}
-        <TouchableOpacity
-          style={{
-            backgroundColor: "lightgrey",
-            alignSelf: "center",
-          }}
-          onPress={() => like(email, item._id)}
-        >
-          <Icon
-            name="md-thumbs-up"
-            color={"purple"}
-            size={26}
+        <View style={{ flexDirection: "row" }}>
+          <Text
             style={{
-              marginRight: 10,
+              flex: 1,
+              fontSize: 19,
+              marginBottom: 10,
+              fontWeight: "700",
+              margin: 10,
+              color: "#fefefe",
             }}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{
-            backgroundColor: "lightgrey",
-            alignSelf: "center",
-          }}
-          onPress={() => dislike(email, item._id)}
-        >
-          <Icon name="md-thumbs-down" color={"purple"} size={26} />
-        </TouchableOpacity>
-        {Array.isArray(item.likes) && (
-          <Text style={styles.title}>
-            {JSON.stringify(item.dislikes.length)}
+          >
+            {username}
           </Text>
-        )}
-        <TouchableOpacity
-          style={{
-            backgroundColor: "lightgrey",
-            alignSelf: "center",
-          }}
-          onPress={() => navigation.navigate("Comment", { item, username, id })}
-        >
-          <Icon
-            name="md-text"
-            color={"purple"}
-            size={26}
+          <Text
             style={{
-              marginLeft: 30,
+              fontSize: 17,
+              marginBottom: 10,
+              fontWeight: "700",
+              margin: 10,
+              color: "#fefefe",
             }}
-          />
-        </TouchableOpacity>
+          >
+            📍{item.location}
+          </Text>
+        </View>
 
-        <TouchableOpacity
-          onPress={() => deleteAlert(item._id)}
-          style={{ alignSelf: "flex-end", flex: 1 }}
+        <Text style={styles.whiteTitle}>{item.caption}</Text>
+        <View>
+          {item.image != "" ? (
+            <Image
+              source={{
+                uri: `http://192.168.1.23:3000/${item.image}`,
+              }}
+              style={{ width: 300, height: 300, alignSelf: "center" }}
+            />
+          ) : (
+            <Text></Text>
+          )}
+        </View>
+        <Text
+          style={{
+            fontSize: 17,
+            marginBottom: 10,
+            fontWeight: "700",
+            margin: 10,
+          }}
         >
-          <Text style={styles.delete}>delete</Text>
-        </TouchableOpacity>
+          {item.topics}
+        </Text>
+        <View style={{ flexDirection: "row", margin: 10 }}>
+          {Array.isArray(item.likes) && (
+            <Text
+              style={{
+                fontSize: 20,
+                marginBottom: 10,
+                fontWeight: "700",
+                margin: 10,
+                color: "#2E875D",
+              }}
+            >
+              {JSON.stringify(item.likes.length)}
+            </Text>
+          )}
+          <TouchableOpacity
+            style={{
+              alignSelf: "center",
+            }}
+            onPress={() => like(email, item._id)}
+          >
+            <Icon
+              name="md-thumbs-up"
+              color={"#2E875D"}
+              size={26}
+              style={{
+                marginRight: 10,
+              }}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              alignSelf: "center",
+            }}
+            onPress={() => dislike(email, item._id)}
+          >
+            <Icon name="md-thumbs-down" color={"#B5493E"} size={26} />
+          </TouchableOpacity>
+          {Array.isArray(item.likes) && (
+            <Text
+              style={{
+                fontSize: 20,
+                marginBottom: 10,
+                fontWeight: "700",
+                margin: 10,
+                color: "#B5493E",
+              }}
+            >
+              {JSON.stringify(item.dislikes.length)}
+            </Text>
+          )}
+          <TouchableOpacity
+            style={{
+              alignSelf: "center",
+            }}
+            onPress={() =>
+              navigation.navigate("Comment", { item, username, id })
+            }
+          >
+            <Icon
+              name="md-text"
+              color={"#f5f5f5"}
+              size={26}
+              style={{
+                marginLeft: 30,
+              }}
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => deleteAlert(item._id)}
+            style={{
+              alignItems: "flex-end",
+              alignSelf: "flex-end",
+              flex: 1,
+              marginLeft: 100,
+            }}
+          >
+            <Icon name="md-trash" color={"#b51d25"} size={30} />
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </LinearGradient>
   );
 
   const renderItem = ({ item }) => <Item item={item} />;
@@ -508,7 +608,21 @@ export default function ProfileScreen({ navigation }) {
                   onChangeText={(text) => setAddConnection(text)}
                   value={addConnection}
                 />
-                <Button title="submit" onPress={() => submitConnection()} />
+                <TouchableOpacity
+                  style={{ margin: 15 }}
+                  onPress={() => submitConnection()}
+                >
+                  <LinearGradient
+                    start={[0, 0.5]}
+                    end={[1, 0.5]}
+                    colors={["#5f2c82", "#49a09d"]}
+                    style={{ borderRadius: 15 }}
+                  >
+                    <View style={styles.circleGradient}>
+                      <Text style={styles.visit}>SUBMIT</Text>
+                    </View>
+                  </LinearGradient>
+                </TouchableOpacity>
               </View>
               <View style={{ alignItems: "center" }}>
                 <Text style={styles.title}>Your connections</Text>
@@ -517,7 +631,19 @@ export default function ProfileScreen({ navigation }) {
           }
           renderItem={({ item }) => (
             <View style={styles.greenItemView}>
-              <Text style={styles.greenItem}>{item.username}</Text>
+              <LinearGradient
+                start={[0, 0.5]}
+                end={[1, 0.5]}
+                colors={["#1cd8d2", "#93edc7"]}
+                style={{
+                  backgroundColor: "red",
+                  borderRadius: 20,
+                  margin: 10,
+                  width: 150,
+                }}
+              >
+                <Text style={styles.greenItem}>{item.username}</Text>
+              </LinearGradient>
               <TouchableOpacity
                 style={styles.deleteTouchable}
                 onPress={() => deleteConnection(item.username)}
@@ -553,7 +679,21 @@ export default function ProfileScreen({ navigation }) {
                   onChangeText={(text) => setAddTopic(text)}
                   value={addTopic}
                 />
-                <Button title="submit" onPress={() => submitTopic()} />
+                <TouchableOpacity
+                  style={{ margin: 15 }}
+                  onPress={() => submitTopic()}
+                >
+                  <LinearGradient
+                    start={[0, 0.5]}
+                    end={[1, 0.5]}
+                    colors={["#5f2c82", "#49a09d"]}
+                    style={{ borderRadius: 15 }}
+                  >
+                    <View style={styles.circleGradient}>
+                      <Text style={styles.visit}>SUBMIT</Text>
+                    </View>
+                  </LinearGradient>
+                </TouchableOpacity>
               </View>
               <View style={{ alignItems: "center" }}>
                 <Text style={styles.title}>Your topics</Text>
@@ -568,7 +708,19 @@ export default function ProfileScreen({ navigation }) {
                 alignSelf: "center",
               }}
             >
-              <Text style={styles.greenItem}>{item}</Text>
+              <LinearGradient
+                start={[0, 0.5]}
+                end={[1, 0.5]}
+                colors={["#1cd8d2", "#93edc7"]}
+                style={{
+                  backgroundColor: "red",
+                  borderRadius: 20,
+                  margin: 10,
+                  width: 150,
+                }}
+              >
+                <Text style={styles.greenItem}>{item}</Text>
+              </LinearGradient>
               <TouchableOpacity
                 style={styles.deleteItem}
                 onPress={() => deleteTopic(item)}
@@ -604,7 +756,21 @@ export default function ProfileScreen({ navigation }) {
                   onChangeText={(text) => setAddLocation(text)}
                   value={addLocation}
                 />
-                <Button title="submit" onPress={() => submitLocation()} />
+                <TouchableOpacity
+                  style={{ margin: 15 }}
+                  onPress={() => submitLocation()}
+                >
+                  <LinearGradient
+                    start={[0, 0.5]}
+                    end={[1, 0.5]}
+                    colors={["#5f2c82", "#49a09d"]}
+                    style={{ borderRadius: 15 }}
+                  >
+                    <View style={styles.circleGradient}>
+                      <Text style={styles.visit}>SUBMIT</Text>
+                    </View>
+                  </LinearGradient>
+                </TouchableOpacity>
               </View>
               <View style={{ alignItems: "center" }}>
                 <Text style={styles.title}>Your locations</Text>
@@ -619,58 +785,20 @@ export default function ProfileScreen({ navigation }) {
                 alignSelf: "center",
               }}
             >
-              <Text style={styles.greenItem}>{item}</Text>
-              <TouchableOpacity
-                style={styles.deleteItem}
-                onPress={() => deleteLocation(item)}
+              <LinearGradient
+                start={[0, 0.5]}
+                end={[1, 0.5]}
+                colors={["#1cd8d2", "#93edc7"]}
+                style={{
+                  backgroundColor: "red",
+                  borderRadius: 20,
+                  margin: 10,
+                  width: 150,
+                }}
               >
-                <Text style={{ color: "red", fontSize: 20, fontWeight: "700" }}>
-                  X
-                </Text>
-              </TouchableOpacity>
-            </View>
-          )}
-          keyExtractor={(item) => item._id}
-        />
-      </Modal>
-      <Modal visible={CommentsVisibility} animationType="slide">
-        <TouchableOpacity
-          style={{
-            alignContent: "stretch",
-            alignItems: "flex-end",
-          }}
-          onPress={() => setCommentsVisibility(false)}
-        >
-          <Text style={{ fontSize: 20, color: "red", margin: 20 }}>close</Text>
-        </TouchableOpacity>
+                <Text style={styles.greenItem}>{item}</Text>
+              </LinearGradient>
 
-        <FlatList
-          data={locations}
-          ListHeaderComponent={
-            <View>
-              <View style={{ marginBottom: 40, alignItems: "center" }}>
-                <Text style={styles.title}>Add a comment</Text>
-                <TextInput
-                  style={styles.flatListInput}
-                  onChangeText={(text) => setAddLocation(text)}
-                  value={addLocation}
-                />
-                <Button title="submit" onPress={() => submitLocation()} />
-              </View>
-              <View style={{ alignItems: "center" }}>
-                <Text style={styles.title}>Comments</Text>
-              </View>
-            </View>
-          }
-          renderItem={({ item }) => (
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                alignSelf: "center",
-              }}
-            >
-              <Text style={styles.greenItem}>{item}</Text>
               <TouchableOpacity
                 style={styles.deleteItem}
                 onPress={() => deleteLocation(item)}
@@ -696,6 +824,19 @@ export default function ProfileScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+  visit: {
+    margin: 2,
+    padding: 3,
+    textAlign: "center",
+    color: "#393939",
+    fontSize: 16,
+    fontWeight: "700",
+  },
+  circleGradient: {
+    margin: 3,
+    backgroundColor: "white",
+    borderRadius: 10,
+  },
   deleteItem: {
     width: 30,
     height: 30,
@@ -728,8 +869,15 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginBottom: 10,
     fontWeight: "700",
-    color: "#393939",
     margin: 10,
+    color: "#393939",
+  },
+  whiteTitle: {
+    fontSize: 20,
+    marginBottom: 10,
+    fontWeight: "700",
+    margin: 10,
+    color: "#fefefe",
   },
   username: {
     fontSize: 40,
@@ -741,7 +889,7 @@ const styles = StyleSheet.create({
   },
 
   itemView: {
-    backgroundColor: "lightgrey",
+    flex: 1,
     margin: 10,
     borderRadius: 20,
     padding: 20,
@@ -752,16 +900,15 @@ const styles = StyleSheet.create({
   },
 
   flatListInput: {
-    height: 40,
-    width: 150,
-    borderWidth: 2,
-    margin: 20,
-    fontSize: 20,
-    padding: 10,
+    fontSize: 18,
+    margin: 5,
+    width: 300,
+    borderBottomColor: "lightgrey",
+    borderBottomWidth: 1,
+    textAlign: "center",
   },
 
   greenItem: {
-    backgroundColor: "lightgreen",
     borderRadius: 20,
     margin: 10,
     width: 150,
