@@ -31,7 +31,8 @@
     "expo-linear-gradient": "~8.3.0"
   },
   "devDependencies": {
-    "@babel/core": "~7.9.0"
+    "@babel/core": "~7.9.0",
+    "@expo/webpack-config": "^0.12.52"
   },
   "private": true
 }

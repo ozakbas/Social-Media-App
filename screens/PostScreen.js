@@ -47,7 +47,7 @@ export default function PostScreen({ navigation }) {
       }),
     };
 
-    fetch("http://192.168.1.23:3000/mobile/addPost", req)
+    fetch("http://192.168.1.26:3000/mobile/addPost", req)
       .then((response) => response.text())
       .then((result) => {
         console.log(result);

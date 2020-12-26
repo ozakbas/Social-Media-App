@@ -112,6 +112,8 @@ export default function App() {
         return "Chat";
       case "Profile":
         return "My profile";
+      case "Notifications":
+        return "Notifications";
     }
   }
 

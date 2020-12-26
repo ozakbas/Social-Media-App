@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import {
-  Button,
   View,
   Text,
   TouchableOpacity,
@@ -9,20 +8,36 @@ import {
   FlatList,
 } from "react-native";
 
-import { AuthContext } from "../context/auth-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "react-native-vector-icons/Ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 
 export default function HomeScreen({ navigation }) {
-  const { signOut } = React.useContext(AuthContext);
-
   const [username, setUsername] = useState("");
   const [id, setId] = useState("");
   const [email, setEmail] = useState("");
   const [posts, setPosts] = useState([]);
 
   const [refresh, setRefresh] = useState(false);
+
+  function report(post_id) {
+    var req = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        postId: post_id,
+      }),
+    };
+
+    fetch("http://192.168.1.26:3000/mobile/report", req)
+      .then((response) => response.text())
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((error) => console.log("error", error));
+  }
 
   function like(email, post_id) {
     setRefresh(true);
@@ -37,7 +52,7 @@ export default function HomeScreen({ navigation }) {
       }),
     };
 
-    fetch("http://192.168.1.23:3000/mobile/like", req)
+    fetch("http://192.168.1.26:3000/mobile/like", req)
       .then((response) => response.text())
       .then((result) => {
         console.log(result);
@@ -57,7 +72,7 @@ export default function HomeScreen({ navigation }) {
       }),
     };
 
-    fetch("http://192.168.1.23:3000/mobile/dislike", req)
+    fetch("http://192.168.1.26:3000/mobile/dislike", req)
       .then((response) => response.text())
       .then((result) => {
         console.log(result);
@@ -76,7 +91,7 @@ export default function HomeScreen({ navigation }) {
       }),
     };
 
-    fetch("http://192.168.1.23:3000/mobile/getNewsfeed", req)
+    fetch("http://192.168.1.26:3000/mobile/getNewsfeed", req)
       .then((response) => response.text())
       .then((result) => JSON.parse(result))
       .then((result) => {
@@ -100,7 +115,7 @@ export default function HomeScreen({ navigation }) {
     };
 
     fetch(
-      `http://192.168.1.23:3000/user/mobile/email/${encodeURIComponent(
+      `http://192.168.1.26:3000/user/mobile/email/${encodeURIComponent(
         data.email
       )}`,
       req
@@ -158,7 +173,7 @@ export default function HomeScreen({ navigation }) {
               color: "#fefefe",
             }}
           >
-            {username}
+            {item.user.username}
           </Text>
           <Text
             style={{
@@ -178,7 +193,7 @@ export default function HomeScreen({ navigation }) {
           {item.image != "" ? (
             <Image
               source={{
-                uri: `http://192.168.1.23:3000/${item.image}`,
+                uri: `http://192.168.1.26:3000/${item.image}`,
               }}
               style={{ width: 300, height: 300, alignSelf: "center" }}
             />
@@ -265,7 +280,7 @@ export default function HomeScreen({ navigation }) {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => console.log(item._id)}
+            onPress={() => report(item._id)}
             style={{
               alignItems: "flex-end",
               alignSelf: "flex-end",

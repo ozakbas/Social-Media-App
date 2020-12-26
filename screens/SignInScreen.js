@@ -40,7 +40,11 @@ export default function SignInScreen() {
       body: JSON.stringify(data),
     };
 
-    fetch("http://192.168.1.23:3000/login", req)
+    var proxyUrl = "https://cors-anywhere.herokuapp.com/";
+    var myUrl = "http://192.168.1.26:3000/login";
+    var finalUrl = proxyUrl + myUrl;
+
+    fetch(myUrl, req)
       .then((response) => response.text())
       .then((result) => JSON.parse(result))
       .then((result) => {

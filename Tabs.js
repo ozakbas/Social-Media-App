@@ -6,7 +6,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 import HomeScreen from "./screens/HomeScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import ChatScreen from "./screens/ChatScreen";
-import ConversationScreen from "./screens/ConversationScreen";
+import NotificationScreen from "./screens/NotificationScreen";
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -31,6 +31,17 @@ const Tabs = () => (
         tabBarColor: "#1f65ff",
         tabBarIcon: ({ color }) => (
           <Icon name="ios-chatbubbles" color={color} size={26} />
+        ),
+      }}
+    />
+    <Tab.Screen
+      name="Notifications"
+      component={NotificationScreen}
+      options={{
+        tabBarLabel: "Notifications",
+        tabBarColor: "#7ac44f",
+        tabBarIcon: ({ color }) => (
+          <Icon name="md-notifications" color={color} size={26} />
         ),
       }}
     />

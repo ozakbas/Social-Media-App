@@ -1,4 +1,4 @@
-import React, { Component, useState, useEffect } from "react";
+import React, { Component } from "react";
 import {
   Button,
   View,
@@ -40,7 +40,7 @@ export default class Conversation extends Component {
     };
 
     fetch(
-      `http://192.168.1.23:3000/user/mobile/email/${encodeURIComponent(
+      `http://192.168.1.26:3000/user/mobile/email/${encodeURIComponent(
         data.email
       )}`,
       req
@@ -68,18 +68,38 @@ export default class Conversation extends Component {
   };
 
   componentDidMount() {
+    console.log(this.props.route.params.item.chatId);
     this.getData();
     this.props.navigation.setOptions({
       headerTitle: this.state.person,
     });
-    this.socket = io("http://192.168.1.23:3000");
-    /*this.socket.on("chat message", (msg) => {
-      this.setState({ chatMessages: [...this.state.chatMessages, msg] });
-    });*/
+
+    this.socket = io("http://192.168.1.26:3000", {
+      query: `roomId=${this.state.chatId}`,
+    });
+
+    this.socket.on("message", (arg) => {
+      console.log(arg);
+
+      this.setState({
+        chatMessages: [...this.state.chatMessages, arg],
+      });
+    });
+  }
+
+  componentWillUnmount() {
+    console.log(this.socket.id);
+    this.socket.disconnect();
   }
 
   submitMessage() {
-    //this.socket.emit("chat message", this.state.chatMessage);
+    console.log(this.state.chatMessage);
+    const message = {
+      sender: this.state.username,
+      text: this.state.chatMessage,
+    };
+
+    this.socket.emit("message", message);
 
     const messageObject = [
       this.state.chatId,
@@ -97,16 +117,11 @@ export default class Conversation extends Component {
       }),
     };
 
-    fetch("http://192.168.1.23:3000/mobile/sendMessage", req)
+    fetch("http://192.168.1.26:3000/mobile/sendMessage", req)
       .then((response) => response.text())
       .then((result) => JSON.parse(result))
       .then((result) => {
-        console.log(this.state.chatMessages);
         console.log(result);
-
-        this.setState((prevState) => ({
-          chatMessages: [...prevState.chatMessages, result],
-        }));
       })
 
       .catch((error) => console.log("error", error));
@@ -127,7 +142,7 @@ export default class Conversation extends Component {
               ? styles.notMineText
               : styles.mineText
           }
-          key={item.text}
+          key={(item) => item.text}
         >
           {item.text}
         </Text>

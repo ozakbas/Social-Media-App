@@ -35,7 +35,7 @@ export default class ChatScreen extends Component {
       }),
     };
 
-    fetch("http://192.168.1.23:3000/mobile/addChat", req)
+    fetch("http://192.168.1.26:3000/mobile/addChat", req)
       .then((response) => response.text())
       .then((result) => JSON.parse(result))
       .then(() => {
@@ -57,7 +57,7 @@ export default class ChatScreen extends Component {
       }),
     };
 
-    fetch("http://192.168.1.23:3000/mobile/showMyChats", req)
+    fetch("http://192.168.1.26:3000/mobile/showMyChats", req)
       .then((response) => response.text())
       .then((result) => JSON.parse(result))
       .then((result) => {
