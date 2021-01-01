@@ -1,6 +1,5 @@
-import * as React from "react";
+import React from "react";
 import {
-  Button,
   View,
   Text,
   TextInput,
@@ -40,23 +39,19 @@ export default function SignInScreen() {
       body: JSON.stringify(data),
     };
 
-    var proxyUrl = "https://cors-anywhere.herokuapp.com/";
     var myUrl = "http://192.168.1.26:3000/login";
-    var finalUrl = proxyUrl + myUrl;
 
     fetch(myUrl, req)
       .then((response) => response.text())
       .then((result) => JSON.parse(result))
       .then((result) => {
         if (result.message == "Email does not exist") {
-          console.log(result.message);
+          return Alert.alert("Email does not exist");
         } else if (result.message == "Password is not correct") {
-          console.log(result.message);
+          return Alert.alert("Password is not correct");
         } else if (result.status == "success") {
-          console.log(data.email);
           storeData(data.email);
-          console.log(result.message);
-          signIn({ email, password });
+          return signIn({ email, password });
         }
       })
       .catch((error) => console.log("error", error));
