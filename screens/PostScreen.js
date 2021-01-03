@@ -1,38 +1,13 @@
-import React from "react";
-import { StyleSheet, Text, View, Button, Alert, TextInput } from "react-native";
+import React, { useState, useEffect } from "react";
+import { StyleSheet, Text, View, Alert, TextInput } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import * as Permissions from "expo-permissions";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { LinearGradient } from "expo-linear-gradient";
-
 import AsyncStorage from "@react-native-async-storage/async-storage";
-export default function PostScreen({ navigation }) {
-  const [email, setemail] = React.useState("");
-  const [caption, setcaption] = React.useState("");
-  const [topics, settopics] = React.useState("");
-  const [location, setlocation] = React.useState("");
-  const [image, setimage] = React.useState("");
 
-  const getData = async () => {
-    try {
-      const value = await AsyncStorage.getItem("@logged_in_email");
-      setemail(value);
-
-      if (value !== null) {
-        // value previously stored
-      }
-    } catch (e) {
-      // error reading value
-      console.log(e);
-    }
-  };
-
-  React.useEffect(() => {
-    getData();
-    //setRefresh(false);
-  }, []);
-
-  function submitPost() {
+export function submitPostLogic(email, caption, topics, location, image) {
+  return new Promise((resolve, reject) => {
     var req = {
       method: "POST",
       headers: {
@@ -50,9 +25,43 @@ export default function PostScreen({ navigation }) {
     fetch("http://192.168.1.26:3000/mobile/addPost", req)
       .then((response) => response.text())
       .then((result) => {
-        console.log(result);
+        resolve(result);
       })
-      .catch((error) => console.log("error", error));
+      .catch((error) => {
+        console.log("error", error);
+        reject();
+      });
+  });
+}
+
+export default function PostScreen({ navigation }) {
+  const [email, setemail] = useState("");
+  const [caption, setcaption] = useState("");
+  const [topics, settopics] = useState("");
+  const [location, setlocation] = useState("");
+  const [image, setimage] = useState("");
+
+  const getData = async () => {
+    try {
+      const value = await AsyncStorage.getItem("@logged_in_email");
+      setemail(value);
+
+      if (value !== null) {
+        // value previously stored
+      }
+    } catch (e) {
+      // error reading value
+      console.log(e);
+    }
+  };
+
+  useEffect(() => {
+    getData();
+    //setRefresh(false);
+  }, []);
+
+  function submitPost() {
+    submitPostLogic(email, caption, topics, location, image);
 
     navigation.goBack();
   }

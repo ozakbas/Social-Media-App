@@ -12,6 +12,90 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "react-native-vector-icons/Ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 
+export class HomeLogic {
+  static like(email, post_id) {
+    return new Promise((resolve, reject) => {
+      var req = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          postId: post_id,
+        }),
+      };
+
+      fetch("http://192.168.1.26:3000/mobile/like", req)
+        .then((response) => response.text())
+        .then((result) => {
+          resolve(result);
+        })
+        .catch((error) => {
+          console.log("error", error);
+          reject();
+        });
+    });
+  }
+
+  static dislike(email, post_id) {
+    return new Promise((resolve, reject) => {
+      var req = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          postId: post_id,
+        }),
+      };
+
+      fetch("http://192.168.1.26:3000/mobile/dislike", req)
+        .then((response) => response.text())
+        .then((result) => {
+          resolve(result);
+        })
+        .catch((error) => {
+          console.log("error", error);
+          reject();
+        });
+    });
+  }
+
+  static getUserInfo(email) {
+    return new Promise((resolve, reject) => {
+      var data = {
+        email: email,
+      };
+
+      var req = {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        email: email,
+      };
+
+      fetch(
+        `http://192.168.1.26:3000/user/mobile/email/${encodeURIComponent(
+          data.email
+        )}`,
+        req
+      )
+        .then((response) => response.text())
+        .then((result) => JSON.parse(result))
+        .then((result) => {
+          resolve(result);
+        })
+        .catch((error) => {
+          console.log("error", error);
+          reject();
+        });
+    });
+  }
+}
+
 export default function HomeScreen({ navigation }) {
   const [username, setUsername] = useState("");
   const [id, setId] = useState("");
@@ -27,11 +111,10 @@ export default function HomeScreen({ navigation }) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        postId: post_id,
+        postid: post_id,
       }),
     };
-
-    fetch("http://192.168.1.26:3000/mobile/report", req)
+    fetch("http://192.168.1.26:3000/mailSend", req)
       .then((response) => response.text())
       .then((result) => {
         console.log(result);
@@ -41,43 +124,12 @@ export default function HomeScreen({ navigation }) {
 
   function like(email, post_id) {
     setRefresh(true);
-    var req = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: email,
-        postId: post_id,
-      }),
-    };
-
-    fetch("http://192.168.1.26:3000/mobile/like", req)
-      .then((response) => response.text())
-      .then((result) => {
-        console.log(result);
-      })
-      .catch((error) => console.log("error", error));
+    HomeLogic.like(email, post_id);
   }
+
   function dislike(email, post_id) {
     setRefresh(true);
-    var req = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: email,
-        postId: post_id,
-      }),
-    };
-
-    fetch("http://192.168.1.26:3000/mobile/dislike", req)
-      .then((response) => response.text())
-      .then((result) => {
-        console.log(result);
-      })
-      .catch((error) => console.log("error", error));
+    HomeLogic.dislike(email, post_id);
   }
 
   function getFeed(value) {
@@ -95,38 +147,16 @@ export default function HomeScreen({ navigation }) {
       .then((response) => response.text())
       .then((result) => JSON.parse(result))
       .then((result) => {
-        console.log(result);
         setPosts(result.data);
       })
       .catch((error) => console.log("error", error));
   }
 
   function getUserInfo(email) {
-    var data = {
-      email: email,
-    };
-
-    var req = {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      email: email,
-    };
-
-    fetch(
-      `http://192.168.1.26:3000/user/mobile/email/${encodeURIComponent(
-        data.email
-      )}`,
-      req
-    )
-      .then((response) => response.text())
-      .then((result) => JSON.parse(result))
-      .then((result) => {
-        setUsername(result.user.username);
-        setId(result.user._id);
-      })
-      .catch((error) => console.log("error", error));
+    HomeLogic.getUserInfo(email).then((result) => {
+      setId(result.user._id);
+      setUsername(result.user.username);
+    });
   }
   const getData = async () => {
     console.log("getdata workin");

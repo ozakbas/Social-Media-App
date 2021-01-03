@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import {
-  Button,
   View,
   Text,
   TouchableOpacity,
@@ -16,6 +15,291 @@ import Icon from "react-native-vector-icons/Ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 
 import { AuthContext } from "../context/auth-context";
+
+export class ProfileLogic {
+  static like(email, post_id) {
+    return new Promise((resolve, reject) => {
+      var req = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          postId: post_id,
+        }),
+      };
+
+      fetch("http://192.168.1.26:3000/mobile/like", req)
+        .then((response) => response.text())
+        .then((result) => {
+          resolve(result);
+        })
+        .catch((error) => {
+          console.log("error", error);
+          reject();
+        });
+    });
+  }
+
+  static dislike(email, post_id) {
+    return new Promise((resolve, reject) => {
+      var req = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          postId: post_id,
+        }),
+      };
+
+      fetch("http://192.168.1.26:3000/mobile/dislike", req)
+        .then((response) => response.text())
+        .then((result) => {
+          resolve(result);
+        })
+        .catch((error) => {
+          console.log("error", error);
+          reject();
+        });
+    });
+  }
+
+  static submitConnection(email, addConnection) {
+    return new Promise((resolve, reject) => {
+      var req = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          username: addConnection,
+        }),
+      };
+
+      fetch("http://192.168.1.26:3000/mobile/addConnection", req)
+        .then((response) => response.text())
+        .then((result) => {
+          resolve(result);
+        })
+        .catch((error) => {
+          console.log("error", error);
+          reject();
+        });
+    });
+  }
+
+  static submitTopic(email, addTopic) {
+    return new Promise((resolve, reject) => {
+      var req = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          topic: addTopic,
+        }),
+      };
+
+      fetch("http://192.168.1.26:3000/mobile/subscribeTopic", req)
+        .then((response) => response.text())
+        .then((result) => {
+          resolve(result);
+        })
+        .catch((error) => {
+          console.log("error", error);
+          reject();
+        });
+    });
+  }
+
+  static deletePost(email, post_id) {
+    return new Promise((resolve, reject) => {
+      var req = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          _id: post_id,
+        }),
+      };
+
+      fetch("http://192.168.1.26:3000/mobile/deletePost", req)
+        .then((response) => response.text())
+        .then((result) => {
+          resolve(result);
+        })
+        .catch((error) => {
+          console.log("error", error);
+          reject();
+        });
+    });
+  }
+
+  static deleteTopic(email, topic) {
+    return new Promise((resolve, reject) => {
+      var req = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          topic: topic,
+        }),
+      };
+
+      fetch("http://192.168.1.26:3000/mobile/unsubscribeTopic", req)
+        .then((response) => response.text())
+        .then((result) => JSON.parse(result))
+        .then((result) => {
+          resolve(result);
+        })
+        .catch((error) => {
+          console.log("error", error);
+          reject();
+        });
+    });
+  }
+
+  static deleteLocation(email, location) {
+    return new Promise((resolve, reject) => {
+      var req = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          location: location,
+        }),
+      };
+
+      fetch("http://192.168.1.26:3000/mobile/unsubscribeLocation", req)
+        .then((response) => response.text())
+        .then((result) => JSON.parse(result))
+        .then((result) => {
+          resolve(result);
+        })
+        .catch((error) => {
+          console.log("error", error);
+          reject();
+        });
+    });
+  }
+
+  static deleteConnection(email, connection) {
+    return new Promise((resolve, reject) => {
+      var req = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          connection: connection,
+        }),
+      };
+
+      fetch("http://192.168.1.26:3000/mobile/deleteConnection", req)
+        .then((response) => response.text())
+        .then((result) => JSON.parse(result))
+        .then((result) => {
+          resolve(result);
+        })
+        .catch((error) => {
+          console.log("error", error);
+          reject();
+        });
+    });
+  }
+
+  static submitLocation(email, addLocation) {
+    return new Promise((resolve, reject) => {
+      var req = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          location: addLocation,
+        }),
+      };
+
+      fetch("http://192.168.1.26:3000/mobile/subscribeLocation", req)
+        .then((response) => response.text())
+        .then((result) => {
+          resolve(result);
+        })
+        .catch((error) => {
+          console.log("error", error);
+          reject();
+        });
+    });
+  }
+
+  static getPosts(id) {
+    return new Promise((resolve, reject) => {
+      var req = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: id }),
+      };
+
+      fetch(`http://192.168.1.26:3000/mobile/showMyPosts`, req)
+        .then((response) => response.text())
+        .then((result) => JSON.parse(result))
+        .then((result) => {
+          resolve(result);
+        })
+        .catch((error) => {
+          console.log("error", error);
+          reject();
+        });
+    });
+  }
+
+  static getUserInfo(email) {
+    return new Promise((resolve, reject) => {
+      var data = {
+        email: email,
+      };
+
+      var req = {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        email: email,
+      };
+
+      fetch(
+        `http://192.168.1.26:3000/user/mobile/email/${encodeURIComponent(
+          data.email
+        )}`,
+        req
+      )
+        .then((response) => response.text())
+        .then((result) => JSON.parse(result))
+        .then((result) => {
+          resolve(result);
+        })
+        .catch((error) => {
+          console.log("error", error);
+          reject();
+        });
+    });
+  }
+}
 
 export default function ProfileScreen({ navigation }) {
   const { signOut } = React.useContext(AuthContext);
@@ -33,7 +317,6 @@ export default function ProfileScreen({ navigation }) {
   const [ModalVisibility, setModalVisibility] = useState(false);
   const [ModalVisibility2, setModalVisibility2] = useState(false);
   const [ModalVisibility3, setModalVisibility3] = useState(false);
-  const [CommentsVisibility, setCommentsVisibility] = useState(false);
 
   const [refresh, setRefresh] = useState(false);
 
@@ -43,115 +326,31 @@ export default function ProfileScreen({ navigation }) {
 
   function like(email, post_id) {
     setRefresh(true);
-    var req = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: email,
-        postId: post_id,
-      }),
-    };
-
-    fetch("http://192.168.1.26:3000/mobile/like", req)
-      .then((response) => response.text())
-      .then((result) => {
-        console.log(result);
-      })
-      .catch((error) => console.log("error", error));
+    ProfileLogic.like(email, post_id);
   }
 
   function dislike(email, post_id) {
     setRefresh(true);
-    var req = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: email,
-        postId: post_id,
-      }),
-    };
-
-    fetch("http://192.168.1.26:3000/mobile/dislike", req)
-      .then((response) => response.text())
-      .then((result) => {
-        console.log(result);
-      })
-      .catch((error) => console.log("error", error));
+    ProfileLogic.dislike(email, post_id);
   }
 
-  function submitConnection() {
+  function submitConnection(email, addConnection) {
     setModalVisibility(false);
     setRefresh(true);
-    console.log(addConnection);
-
-    var req = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: email,
-        username: addConnection,
-      }),
-    };
-
-    fetch("http://192.168.1.26:3000/mobile/addConnection", req)
-      .then((response) => response.text())
-      .then((result) => {
-        console.log(result);
-      })
-      .catch((error) => console.log("error", error));
     setAddConnection("");
+    ProfileLogic.submitConnection(email, addConnection);
   }
 
-  function submitTopic() {
+  function submitTopic(email, addTopic) {
     setModalVisibility2(false);
     setRefresh(true);
-
-    var req = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: email,
-        topic: addTopic,
-      }),
-    };
-
-    fetch("http://192.168.1.26:3000/mobile/subscribeTopic", req)
-      .then((response) => response.text())
-      .then((result) => {
-        console.log(result);
-      })
-      .catch((error) => console.log("error", error));
     setAddTopic("");
+    ProfileLogic.submitTopic(email, addTopic);
   }
 
-  function deletePost(post_id) {
+  function deletePost(email, post_id) {
     setRefresh(true);
-
-    var req = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: email,
-        _id: post_id,
-      }),
-    };
-
-    fetch("http://192.168.1.26:3000/mobile/deletePost", req)
-      .then((response) => response.text())
-      .then((result) => {
-        console.log(result);
-      })
-      .catch((error) => console.log("error", error));
+    ProfileLogic.deletePost(email, post_id);
   }
 
   function deleteAlert(post_id) {
@@ -164,169 +363,50 @@ export default function ProfileScreen({ navigation }) {
           onPress: () => console.log("Cancel Pressed"),
           style: "cancel",
         },
-        { text: "OK", onPress: () => deletePost(post_id) },
+        { text: "OK", onPress: () => deletePost(email, post_id) },
       ],
       { cancelable: false }
     );
   }
 
-  function deleteTopic(topic) {
+  function deleteTopic(email, topic) {
     setRefresh(true);
-
-    var req = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: email,
-        topic: topic,
-      }),
-    };
-
-    fetch("http://192.168.1.26:3000/mobile/unsubscribeTopic", req)
-      .then((response) => response.text())
-
-      .catch((error) => console.log("error", error));
+    ProfileLogic.deleteTopic(email, topic);
   }
 
-  function deleteLocation(location) {
+  function deleteLocation(email, location) {
     setRefresh(true);
-
-    var req = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: email,
-        location: location,
-      }),
-    };
-
-    fetch("http://192.168.1.26:3000/mobile/unsubscribeLocation", req)
-      .then((response) => response.text())
-
-      .catch((error) => console.log("error", error));
+    ProfileLogic.deleteLocation(email, location);
   }
 
-  function deleteConnection(connection) {
+  function deleteConnection(email, connection) {
     setRefresh(true);
-    console.log(JSON.stringify(connection));
-
-    var req = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: email,
-        connection: connection,
-      }),
-    };
-
-    fetch("http://192.168.1.26:3000/mobile/deleteConnection", req)
-      .then((response) => response.text())
-      .catch((error) => console.log("error", error));
+    ProfileLogic.deleteConnection(email, connection);
   }
 
-  function submitTopic() {
-    setAddTopic("");
-    setModalVisibility2(false);
-    setRefresh(true);
-
-    var req = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: email,
-        topic: addTopic,
-      }),
-    };
-
-    fetch("http://192.168.1.26:3000/mobile/subscribeTopic", req)
-      .then((response) => response.text())
-      .then((result) => {
-        console.log(result);
-      })
-      .catch((error) => console.log("error", error));
-  }
-
-  function submitLocation() {
+  function submitLocation(email, addLocation) {
     setAddLocation("");
     setModalVisibility3(false);
     setRefresh(true);
-
-    var req = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: email,
-        location: addLocation,
-      }),
-    };
-
-    fetch("http://192.168.1.26:3000/mobile/subscribeLocation", req)
-      .then((response) => response.text())
-      .then((result) => {
-        console.log(result);
-      })
-      .catch((error) => console.log("error", error));
+    ProfileLogic.submitLocation(email, addLocation);
   }
 
   function getPosts(id) {
-    var req = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ id: id }),
-    };
-
-    fetch(`http://192.168.1.26:3000/mobile/showMyPosts`, req)
-      .then((response) => response.text())
-      .then((result) => JSON.parse(result))
-      .then((result) => {
-        setPosts(result.posts.reverse());
-      })
-      .catch((error) => console.log("error", error));
+    ProfileLogic.getPosts(id).then((result) => {
+      setPosts(result.posts.reverse());
+    });
   }
 
   function getUserInfo(email) {
-    var data = {
-      email: email,
-    };
-
-    var req = {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      email: email,
-    };
-
-    fetch(
-      `http://192.168.1.26:3000/user/mobile/email/${encodeURIComponent(
-        data.email
-      )}`,
-      req
-    )
-      .then((response) => response.text())
-      .then((result) => JSON.parse(result))
-      .then((result) => {
-        setId(result.user._id);
-        setUsername(result.user.username);
-        setProfileImage(result.user.profileImage);
-        setConnections(result.user.friends);
-        setLocations(result.user.locations);
-        setTopics(result.user.topics);
-        getPosts(result.user._id);
-      })
-      .catch((error) => console.log("error", error));
+    ProfileLogic.getUserInfo(email).then((result) => {
+      setId(result.user._id);
+      setUsername(result.user.username);
+      setProfileImage(result.user.profileImage);
+      setConnections(result.user.friends);
+      setLocations(result.user.locations);
+      setTopics(result.user.topics);
+      getPosts(result.user._id);
+    });
   }
 
   const getData = async () => {
@@ -610,7 +690,7 @@ export default function ProfileScreen({ navigation }) {
                 />
                 <TouchableOpacity
                   style={{ margin: 15 }}
-                  onPress={() => submitConnection()}
+                  onPress={() => submitConnection(email, addConnection)}
                 >
                   <LinearGradient
                     start={[0, 0.5]}
@@ -646,7 +726,7 @@ export default function ProfileScreen({ navigation }) {
               </LinearGradient>
               <TouchableOpacity
                 style={styles.deleteTouchable}
-                onPress={() => deleteConnection(item.username)}
+                onPress={() => deleteConnection(email, item.username)}
               >
                 <Text style={{ color: "red", fontSize: 20, fontWeight: "700" }}>
                   X
@@ -681,7 +761,7 @@ export default function ProfileScreen({ navigation }) {
                 />
                 <TouchableOpacity
                   style={{ margin: 15 }}
-                  onPress={() => submitTopic()}
+                  onPress={() => submitTopic(email, addTopic)}
                 >
                   <LinearGradient
                     start={[0, 0.5]}
@@ -723,7 +803,7 @@ export default function ProfileScreen({ navigation }) {
               </LinearGradient>
               <TouchableOpacity
                 style={styles.deleteItem}
-                onPress={() => deleteTopic(item)}
+                onPress={() => deleteTopic(email, item)}
               >
                 <Text style={{ color: "red", fontSize: 20, fontWeight: "700" }}>
                   X
@@ -758,7 +838,7 @@ export default function ProfileScreen({ navigation }) {
                 />
                 <TouchableOpacity
                   style={{ margin: 15 }}
-                  onPress={() => submitLocation()}
+                  onPress={() => submitLocation(email, addLocation)}
                 >
                   <LinearGradient
                     start={[0, 0.5]}
@@ -801,7 +881,7 @@ export default function ProfileScreen({ navigation }) {
 
               <TouchableOpacity
                 style={styles.deleteItem}
-                onPress={() => deleteLocation(item)}
+                onPress={() => deleteLocation(email, item)}
               >
                 <Text style={{ color: "red", fontSize: 20, fontWeight: "700" }}>
                   X

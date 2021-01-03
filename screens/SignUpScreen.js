@@ -1,32 +1,18 @@
-import * as React from "react";
+import React, { useState, useContext } from "react";
 import {
-  Button,
   View,
   Text,
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { AuthContext } from "../context/auth-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
 
-export default function SignUpScreen() {
-  const [username, setUsername] = React.useState("");
-  const [email, setEmail] = React.useState("");
-  const [password, setPassword] = React.useState("");
-
-  const { signUp } = React.useContext(AuthContext);
-
-  const storeData = async (value) => {
-    try {
-      await AsyncStorage.setItem("@logged_in_email", value);
-    } catch (e) {
-      // saving error
-    }
-  };
-
-  function handleSubmit(username, email, password) {
+export function SignUpLogic(username, email, password) {
+  return new Promise((resolve, reject) => {
     var data = {
       username: username,
       email: email,
@@ -41,24 +27,47 @@ export default function SignUpScreen() {
       body: JSON.stringify(data),
     };
 
-    fetch("http://192.168.1.26:3000/signup", req)
+    var myUrl = "http://192.168.1.26:3000/signup";
+
+    fetch(myUrl, req)
       .then((response) => response.text())
       .then((result) => JSON.parse(result))
       .then((result) => {
-        if (result.message == "Email or username already exist.")
-          console.log(result.message);
-        else if (
-          result.message == "Signed up successfully. You can login now."
-        ) {
-          signUp({ username, password });
-          console.log(result);
-          console.log(data.email);
-          storeData(data.email);
-        } else {
-          console.log(result.message);
-        }
+        resolve(result);
       })
-      .catch((error) => console.log("error", error));
+      .catch((error) => {
+        console.log("error", error);
+        reject();
+      });
+  });
+}
+
+export default function SignUpScreen() {
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const { signUp } = useContext(AuthContext);
+
+  const storeData = async (value) => {
+    try {
+      await AsyncStorage.setItem("@logged_in_email", value);
+    } catch (e) {
+      // saving error
+    }
+  };
+
+  function handleSubmit(username, email, password) {
+    SignUpLogic(username, email, password).then((result) => {
+      if (result.message == "Email or username already exist.")
+        return Alert.alert(result.message);
+      else if (result.message == "Signed up successfully. You can login now.") {
+        signUp({ username, password });
+        storeData(email);
+      } else {
+        return Alert.alert(result.message);
+      }
+    });
   }
 
   return (

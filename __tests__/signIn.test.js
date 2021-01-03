@@ -1,6 +1,7 @@
-import React from "react";
-const { SignIn } = require("../screens/SignInScreen");
+import { SignInLogic } from "../screens/SignInScreen";
 
 test("just an example", () => {
-  expect(SignIn.handleSubmit("u", "u")).toEqual("x");
+  SignInLogic("ffghu", "u").then((result) => {
+    expect(result).toBe("This is a dummy function");
+  });
 });

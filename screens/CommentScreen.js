@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -10,14 +10,12 @@ import {
 import Icon from "react-native-vector-icons/Ionicons";
 
 export default function CommentScreen({ route, navigation }) {
-  const [id, setId] = React.useState(route.params.id);
-  const [postId, setpostId] = React.useState(route.params.item._id);
-  const [username, setUsername] = React.useState(route.params.username);
-  const [comment, setcomment] = React.useState("");
+  const [id, setId] = useState(route.params.id);
+  const [postId, setpostId] = useState(route.params.item._id);
+  const [username, setUsername] = useState(route.params.username);
+  const [comment, setcomment] = useState("");
 
-  const [commentArray, setcommentArray] = React.useState(
-    route.params.item.comments
-  );
+  const [commentArray, setcommentArray] = useState(route.params.item.comments);
 
   function postComment() {
     var req = {
@@ -39,12 +37,6 @@ export default function CommentScreen({ route, navigation }) {
         console.log(result);
       })
       .catch((error) => console.log("error", error));
-
-    console.log(route.params);
-    console.log(postId);
-    console.log(id);
-    console.log(username);
-    console.log(comment);
 
     navigation.goBack();
   }

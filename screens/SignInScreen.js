@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useContext } from "react";
 import {
   View,
   Text,
@@ -11,21 +11,8 @@ import { AuthContext } from "../context/auth-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
 
-export default function SignInScreen() {
-  const [email, setEmail] = React.useState("");
-  const [password, setPassword] = React.useState("");
-
-  const { signIn } = React.useContext(AuthContext);
-
-  const storeData = async (value) => {
-    try {
-      await AsyncStorage.setItem("@logged_in_email", value);
-    } catch (e) {
-      // saving error
-    }
-  };
-
-  function handleSubmit(email, password) {
+export function SignInLogic(email, password) {
+  return new Promise((resolve, reject) => {
     var data = {
       email: email,
       password: password,
@@ -45,16 +32,41 @@ export default function SignInScreen() {
       .then((response) => response.text())
       .then((result) => JSON.parse(result))
       .then((result) => {
-        if (result.message == "Email does not exist") {
-          return Alert.alert("Email does not exist");
-        } else if (result.message == "Password is not correct") {
-          return Alert.alert("Password is not correct");
-        } else if (result.status == "success") {
-          storeData(data.email);
-          return signIn({ email, password });
-        }
+        resolve(result);
       })
-      .catch((error) => console.log("error", error));
+      .catch((error) => {
+        console.log("error", error);
+        reject();
+      });
+  });
+}
+
+export default function SignInScreen() {
+  const [email, setEmail] = useState();
+  const [password, setPassword] = useState();
+
+  const { signIn } = React.useContext(AuthContext);
+
+  const storeData = async (value) => {
+    try {
+      await AsyncStorage.setItem("@logged_in_email", value);
+    } catch (e) {
+      // saving error
+    }
+  };
+
+  function handleSubmit(email, password) {
+    SignInLogic(email, password).then((result) => {
+      if (
+        result.message == "Email does not exist" ||
+        result.message == "Password is not correct"
+      ) {
+        return Alert.alert(result.message);
+      } else if (result.status == "success") {
+        storeData(email);
+        return signIn({ email, password });
+      }
+    });
   }
 
   return (

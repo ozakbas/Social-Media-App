@@ -11,12 +11,7 @@ import { LinearGradient } from "expo-linear-gradient";
 
 export default function WelcomeScreen({ navigation }) {
   return (
-    <LinearGradient
-      style={{ flex: 1 }}
-      //colors={["#962fbf", "#d62976", "#fa7e1e", "#feda75"]}
-      //colors={["#5f2c82", "#49a09d"]}
-      colors={["#1488cc", "#2b32b2"]}
-    >
+    <LinearGradient style={{ flex: 1 }} colors={["#1488cc", "#2b32b2"]}>
       <View
         style={{
           flex: 1,

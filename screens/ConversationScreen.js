@@ -12,6 +12,40 @@ import io from "socket.io-client";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "react-native-vector-icons/Ionicons";
 
+export class ConversationLogic {
+  static getUserInfo(email) {
+    return new Promise((resolve, reject) => {
+      var data = {
+        email: email,
+      };
+
+      var req = {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        email: email,
+      };
+
+      fetch(
+        `http://192.168.1.26:3000/user/mobile/email/${encodeURIComponent(
+          data.email
+        )}`,
+        req
+      )
+        .then((response) => response.text())
+        .then((result) => JSON.parse(result))
+        .then((result) => {
+          resolve(result);
+        })
+        .catch((error) => {
+          console.log("error", error);
+          reject();
+        });
+    });
+  }
+}
+
 export default class Conversation extends Component {
   constructor(props) {
     super(props);
@@ -20,37 +54,15 @@ export default class Conversation extends Component {
       chatMessage: "",
       chatMessages: props.route.params.item.messages,
       chatId: props.route.params.item.chatId,
-      //lastMessage: props.route.params.item.messages;
 
       person: this.props.route.params.item.person[0],
     };
   }
 
   getUserInfo(email) {
-    var data = {
-      email: email,
-    };
-
-    var req = {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      email: email,
-    };
-
-    fetch(
-      `http://192.168.1.26:3000/user/mobile/email/${encodeURIComponent(
-        data.email
-      )}`,
-      req
-    )
-      .then((response) => response.text())
-      .then((result) => JSON.parse(result))
-      .then((result) => {
-        this.setState({ username: result.user.username });
-      })
-      .catch((error) => console.log("error", error));
+    ConversationLogic.getUserInfo(email).then((result) => {
+      this.setState({ username: result.user.username });
+    });
   }
 
   getData = async () => {
@@ -68,7 +80,6 @@ export default class Conversation extends Component {
   };
 
   componentDidMount() {
-    console.log(this.props.route.params.item.chatId);
     this.getData();
     this.props.navigation.setOptions({
       headerTitle: this.state.person,

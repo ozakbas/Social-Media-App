@@ -12,6 +12,59 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
 
+export class ChatLogic {
+  static createConversation(email, person) {
+    return new Promise((resolve, reject) => {
+      var req = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          username: person,
+        }),
+      };
+
+      fetch("http://192.168.1.26:3000/mobile/addChat", req)
+        .then((response) => response.text())
+        .then((result) => JSON.parse(result))
+        .then((result) => {
+          resolve(result);
+        })
+        .catch((error) => {
+          console.log("error", error);
+          reject();
+        });
+    });
+  }
+
+  static getConversations(value) {
+    return new Promise((resolve, reject) => {
+      var req = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: value,
+        }),
+      };
+
+      fetch("http://192.168.1.26:3000/mobile/showMyChats", req)
+        .then((response) => response.text())
+        .then((result) => JSON.parse(result))
+        .then((result) => {
+          resolve(result);
+        })
+        .catch((error) => {
+          console.log("error", error);
+          reject();
+        });
+    });
+  }
+}
+
 export default class ChatScreen extends Component {
   constructor(props) {
     super(props);
@@ -23,47 +76,18 @@ export default class ChatScreen extends Component {
     };
   }
 
-  createConversation() {
-    var req = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: this.state.email,
-        username: this.state.person,
-      }),
-    };
-
-    fetch("http://192.168.1.26:3000/mobile/addChat", req)
-      .then((response) => response.text())
-      .then((result) => JSON.parse(result))
-      .then(() => {
-        this.getData();
-      })
-      .catch((error) => console.log("error", error));
+  createConversation(email, person) {
+    ChatLogic.createConversation(email, person).then(() => {
+      this.getData();
+    });
 
     this.setState({ person: "" });
   }
 
   getConversations(value) {
-    var req = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: value,
-      }),
-    };
-
-    fetch("http://192.168.1.26:3000/mobile/showMyChats", req)
-      .then((response) => response.text())
-      .then((result) => JSON.parse(result))
-      .then((result) => {
-        this.setState({ conversations: result.data });
-      })
-      .catch((error) => console.log("error", error));
+    ChatLogic.getConversations(this.state.email).then((result) => {
+      this.setState({ conversations: result.data });
+    });
   }
 
   getData = async () => {
@@ -121,7 +145,14 @@ export default class ChatScreen extends Component {
                     padding: 5,
                   }}
                 >
-                  <TouchableOpacity onPress={() => this.createConversation()}>
+                  <TouchableOpacity
+                    onPress={() =>
+                      this.createConversation(
+                        this.state.email,
+                        this.state.person
+                      )
+                    }
+                  >
                     <Text
                       style={{
                         fontSize: 15,
@@ -148,7 +179,6 @@ export default class ChatScreen extends Component {
                 start={[0, 1]}
                 end={[1, 0]}
                 style={{
-                  flexDirection: "row",
                   backgroundColor: "#f5a140",
                   margin: 15,
                   padding: 15,
@@ -160,6 +190,17 @@ export default class ChatScreen extends Component {
                 <Text style={{ fontSize: 23, color: "white" }}>
                   {item.person}
                 </Text>
+                {item.messages.slice(-1)[0] && (
+                  <View style={{ flexDirection: "row" }}>
+                    <Text style={{ fontSize: 18 }}>
+                      {item.messages.slice(-1)[0].sender}
+                      {": "}
+                    </Text>
+                    <Text style={{ fontSize: 18 }}>
+                      {item.messages.slice(-1)[0].text}
+                    </Text>
+                  </View>
+                )}
               </LinearGradient>
             </TouchableOpacity>
           )}
@@ -170,6 +211,7 @@ export default class ChatScreen extends Component {
     );
   }
 }
+
 const styles = StyleSheet.create({
   textInput: {
     fontSize: 18,
