@@ -13,7 +13,6 @@ import WelcomeScreen from "./screens/WelcomeScreen";
 import PostScreen from "./screens/PostScreen";
 import CommentScreen from "./screens/CommentScreen";
 import ConversationScreen from "./screens/ConversationScreen";
-
 import Tabs from "./Tabs";
 
 const Stack = createStackNavigator();

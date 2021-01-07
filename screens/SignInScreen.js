@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -26,7 +26,7 @@ export function SignInLogic(email, password) {
       body: JSON.stringify(data),
     };
 
-    var myUrl = "http://192.168.1.26:3000/login";
+    var myUrl = "http://192.168.1.27:3000/login";
 
     fetch(myUrl, req)
       .then((response) => response.text())
@@ -35,8 +35,7 @@ export function SignInLogic(email, password) {
         resolve(result);
       })
       .catch((error) => {
-        console.log("error", error);
-        reject();
+        reject(error);
       });
   });
 }

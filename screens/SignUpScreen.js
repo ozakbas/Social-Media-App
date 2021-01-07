@@ -27,7 +27,7 @@ export function SignUpLogic(username, email, password) {
       body: JSON.stringify(data),
     };
 
-    var myUrl = "http://192.168.1.26:3000/signup";
+    var myUrl = "http://192.168.1.27:3000/signup";
 
     fetch(myUrl, req)
       .then((response) => response.text())

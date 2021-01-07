@@ -26,7 +26,7 @@ export class HomeLogic {
         }),
       };
 
-      fetch("http://192.168.1.26:3000/mobile/like", req)
+      fetch("http://192.168.1.27:3000/mobile/like", req)
         .then((response) => response.text())
         .then((result) => {
           resolve(result);
@@ -51,7 +51,7 @@ export class HomeLogic {
         }),
       };
 
-      fetch("http://192.168.1.26:3000/mobile/dislike", req)
+      fetch("http://192.168.1.27:3000/mobile/dislike", req)
         .then((response) => response.text())
         .then((result) => {
           resolve(result);
@@ -78,7 +78,7 @@ export class HomeLogic {
       };
 
       fetch(
-        `http://192.168.1.26:3000/user/mobile/email/${encodeURIComponent(
+        `http://192.168.1.27:3000/user/mobile/email/${encodeURIComponent(
           data.email
         )}`,
         req
@@ -114,7 +114,7 @@ export default function HomeScreen({ navigation }) {
         postid: post_id,
       }),
     };
-    fetch("http://192.168.1.26:3000/mailSend", req)
+    fetch("http://192.168.1.27:3000/mailSend", req)
       .then((response) => response.text())
       .then((result) => {
         console.log(result);
@@ -143,7 +143,7 @@ export default function HomeScreen({ navigation }) {
       }),
     };
 
-    fetch("http://192.168.1.26:3000/mobile/getNewsfeed", req)
+    fetch("http://192.168.1.27:3000/mobile/getNewsfeed", req)
       .then((response) => response.text())
       .then((result) => JSON.parse(result))
       .then((result) => {
@@ -223,7 +223,7 @@ export default function HomeScreen({ navigation }) {
           {item.image != "" ? (
             <Image
               source={{
-                uri: `http://192.168.1.26:3000/${item.image}`,
+                uri: `http://192.168.1.27:3000/${item.image}`,
               }}
               style={{ width: 300, height: 300, alignSelf: "center" }}
             />
@@ -398,7 +398,7 @@ const styles = StyleSheet.create({
   itemView: {
     backgroundColor: "lightgrey",
     margin: 10,
-    borderRadius: 20,
+    borderRadius: 10,
     padding: 20,
   },
   modelTouchable: {

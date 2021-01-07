@@ -26,7 +26,7 @@ export class ChatLogic {
         }),
       };
 
-      fetch("http://192.168.1.26:3000/mobile/addChat", req)
+      fetch("http://192.168.1.27:3000/mobile/addChat", req)
         .then((response) => response.text())
         .then((result) => JSON.parse(result))
         .then((result) => {
@@ -51,7 +51,7 @@ export class ChatLogic {
         }),
       };
 
-      fetch("http://192.168.1.26:3000/mobile/showMyChats", req)
+      fetch("http://192.168.1.27:3000/mobile/showMyChats", req)
         .then((response) => response.text())
         .then((result) => JSON.parse(result))
         .then((result) => {
