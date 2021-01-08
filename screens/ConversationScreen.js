@@ -28,7 +28,7 @@ export class ConversationLogic {
       };
 
       fetch(
-        `http://192.168.1.27:3000/user/mobile/email/${encodeURIComponent(
+        `http://192.168.1.32:3000/user/mobile/email/${encodeURIComponent(
           data.email
         )}`,
         req
@@ -85,7 +85,7 @@ export default class Conversation extends Component {
       headerTitle: this.state.person,
     });
 
-    this.socket = io("http://192.168.1.27:3000", {
+    this.socket = io("http://192.168.1.32:3000", {
       query: `roomId=${this.state.chatId}`,
     });
 
@@ -128,7 +128,7 @@ export default class Conversation extends Component {
       }),
     };
 
-    fetch("http://192.168.1.27:3000/mobile/sendMessage", req)
+    fetch("http://192.168.1.32:3000/mobile/sendMessage", req)
       .then((response) => response.text())
       .then((result) => JSON.parse(result))
       .then((result) => {

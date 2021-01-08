@@ -13,7 +13,29 @@ import Icon from "react-native-vector-icons/Ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 
 export class HomeLogic {
-  static like(email, post_id) {
+  static sendNotif(message, username, postId) {
+    var req = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        message: message,
+        username: username,
+        postId: postId,
+      }),
+    };
+
+    fetch("http://192.168.1.32:3000/mobile/expoNotification", req)
+      .then((response) => response.text())
+      .then((result) => JSON.parse(result))
+      .then((result) => {
+        console.log(result);
+      })
+
+      .catch((error) => console.log("error", error));
+  }
+  static like(email, post_id, username) {
     return new Promise((resolve, reject) => {
       var req = {
         method: "POST",
@@ -26,9 +48,10 @@ export class HomeLogic {
         }),
       };
 
-      fetch("http://192.168.1.27:3000/mobile/like", req)
+      fetch("http://192.168.1.32:3000/mobile/like", req)
         .then((response) => response.text())
         .then((result) => {
+          this.sendNotif("liked your post", username, post_id);
           resolve(result);
         })
         .catch((error) => {
@@ -37,7 +60,6 @@ export class HomeLogic {
         });
     });
   }
-
   static dislike(email, post_id) {
     return new Promise((resolve, reject) => {
       var req = {
@@ -51,7 +73,7 @@ export class HomeLogic {
         }),
       };
 
-      fetch("http://192.168.1.27:3000/mobile/dislike", req)
+      fetch("http://192.168.1.32:3000/mobile/dislike", req)
         .then((response) => response.text())
         .then((result) => {
           resolve(result);
@@ -62,7 +84,6 @@ export class HomeLogic {
         });
     });
   }
-
   static getUserInfo(email) {
     return new Promise((resolve, reject) => {
       var data = {
@@ -78,7 +99,7 @@ export class HomeLogic {
       };
 
       fetch(
-        `http://192.168.1.27:3000/user/mobile/email/${encodeURIComponent(
+        `http://192.168.1.32:3000/user/mobile/email/${encodeURIComponent(
           data.email
         )}`,
         req
@@ -114,7 +135,7 @@ export default function HomeScreen({ navigation }) {
         postid: post_id,
       }),
     };
-    fetch("http://192.168.1.27:3000/mailSend", req)
+    fetch("http://192.168.1.32:3000/mailSend", req)
       .then((response) => response.text())
       .then((result) => {
         console.log(result);
@@ -122,9 +143,9 @@ export default function HomeScreen({ navigation }) {
       .catch((error) => console.log("error", error));
   }
 
-  function like(email, post_id) {
+  function like(email, post_id, username) {
     setRefresh(true);
-    HomeLogic.like(email, post_id);
+    HomeLogic.like(email, post_id, username);
   }
 
   function dislike(email, post_id) {
@@ -143,7 +164,7 @@ export default function HomeScreen({ navigation }) {
       }),
     };
 
-    fetch("http://192.168.1.27:3000/mobile/getNewsfeed", req)
+    fetch("http://192.168.1.32:3000/mobile/getNewsfeed", req)
       .then((response) => response.text())
       .then((result) => JSON.parse(result))
       .then((result) => {
@@ -223,7 +244,7 @@ export default function HomeScreen({ navigation }) {
           {item.image != "" ? (
             <Image
               source={{
-                uri: `http://192.168.1.27:3000/${item.image}`,
+                uri: `http://192.168.1.32:3000/${item.image}`,
               }}
               style={{ width: 300, height: 300, alignSelf: "center" }}
             />
@@ -259,7 +280,7 @@ export default function HomeScreen({ navigation }) {
             style={{
               alignSelf: "center",
             }}
-            onPress={() => like(email, item._id)}
+            onPress={() => like(email, item._id, username)}
           >
             <Icon
               name="md-thumbs-up"

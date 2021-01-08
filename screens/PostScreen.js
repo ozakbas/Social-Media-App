@@ -22,7 +22,7 @@ export function submitPostLogic(email, caption, topics, location, image) {
       }),
     };
 
-    fetch("http://192.168.1.27:3000/mobile/addPost", req)
+    fetch("http://192.168.1.32:3000/mobile/addPost", req)
       .then((response) => response.text())
       .then((result) => {
         resolve(result);

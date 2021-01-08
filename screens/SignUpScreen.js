@@ -7,16 +7,21 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
+import Constants from "expo-constants";
+import * as Notifications from "expo-notifications";
+import * as Permissions from "expo-permissions";
 import { AuthContext } from "../context/auth-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
+import { useEffect } from "react";
 
-export function SignUpLogic(username, email, password) {
+export function SignUpLogic(username, email, password, device_token) {
   return new Promise((resolve, reject) => {
     var data = {
       username: username,
       email: email,
       password: password,
+      device_token: device_token,
     };
 
     var req = {
@@ -27,7 +32,7 @@ export function SignUpLogic(username, email, password) {
       body: JSON.stringify(data),
     };
 
-    var myUrl = "http://192.168.1.27:3000/signup";
+    var myUrl = "http://192.168.1.32:3000/mobile/signup";
 
     fetch(myUrl, req)
       .then((response) => response.text())
@@ -46,24 +51,62 @@ export default function SignUpScreen() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [device_token, set_device_token] = useState("");
 
   const { signUp } = useContext(AuthContext);
 
-  const storeData = async (value) => {
+  useEffect(() => {
+    registerForPushNotificationsAsync();
+  }, []);
+
+  const storEmail = async (email) => {
     try {
-      await AsyncStorage.setItem("@logged_in_email", value);
+      await AsyncStorage.setItem("@logged_in_email", email);
     } catch (e) {
       // saving error
+      console.log(e);
     }
   };
 
-  function handleSubmit(username, email, password) {
-    SignUpLogic(username, email, password).then((result) => {
+  const registerForPushNotificationsAsync = async () => {
+    if (Constants.isDevice) {
+      const { status: existingStatus } = await Permissions.getAsync(
+        Permissions.NOTIFICATIONS
+      );
+      let finalStatus = existingStatus;
+      if (existingStatus !== "granted") {
+        const { status } = await Permissions.askAsync(
+          Permissions.NOTIFICATIONS
+        );
+        finalStatus = status;
+      }
+      if (finalStatus !== "granted") {
+        alert("Failed to get push token for push notification!");
+        return;
+      }
+      const token = (await Notifications.getExpoPushTokenAsync()).data;
+      set_device_token(token);
+    } else {
+      alert("Must use physical device for Push Notifications");
+    }
+
+    if (Platform.OS === "android") {
+      Notifications.setNotificationChannelAsync("default", {
+        name: "default",
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: "#FF231F7C",
+      });
+    }
+  };
+
+  function handleSubmit(username, email, password, device_token) {
+    SignUpLogic(username, email, password, device_token).then((result) => {
       if (result.message == "Email or username already exist.")
         return Alert.alert(result.message);
       else if (result.message == "Signed up successfully. You can login now.") {
         signUp({ username, password });
-        storeData(email);
+        storeEmail(email);
       } else {
         return Alert.alert(result.message);
       }
@@ -103,7 +146,7 @@ export default function SignUpScreen() {
         />
         <TouchableOpacity
           style={{ margin: 15 }}
-          onPress={() => handleSubmit(username, email, password)}
+          onPress={() => handleSubmit(username, email, password, device_token)}
         >
           <LinearGradient
             start={[0, 0.5]}

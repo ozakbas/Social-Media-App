@@ -85,7 +85,30 @@ export default function App() {
 
         dispatch({ type: "SIGN_IN", token: "dummy-auth-token" });
       },
-      signOut: () => dispatch({ type: "SIGN_OUT" }),
+      signOut: async (data) => {
+        let email = data.email;
+
+        var req = {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: email,
+          }),
+        };
+
+        fetch("http://192.168.1.32:3000/mobile/resetDeviceToken", req)
+          .then((response) => response.text())
+          .then((result) => {
+            console.log(result);
+          })
+          .catch((error) => {
+            console.log("error", error);
+          });
+
+        dispatch({ type: "SIGN_OUT" });
+      },
       signUp: async (data) => {
         // In a production app, we need to send user data to server and get a token
         // We will also need to handle errors if sign up failed

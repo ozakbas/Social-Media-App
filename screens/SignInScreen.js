@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -11,11 +11,16 @@ import { AuthContext } from "../context/auth-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
 
-export function SignInLogic(email, password) {
+import Constants from "expo-constants";
+import * as Notifications from "expo-notifications";
+import * as Permissions from "expo-permissions";
+
+export function SignInLogic(email, password, device_token) {
   return new Promise((resolve, reject) => {
     var data = {
       email: email,
       password: password,
+      device_token: device_token,
     };
 
     var req = {
@@ -26,7 +31,7 @@ export function SignInLogic(email, password) {
       body: JSON.stringify(data),
     };
 
-    var myUrl = "http://192.168.1.27:3000/login";
+    var myUrl = "http://192.168.1.32:3000/login";
 
     fetch(myUrl, req)
       .then((response) => response.text())
@@ -43,30 +48,68 @@ export function SignInLogic(email, password) {
 export default function SignInScreen() {
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
+  const [device_token, set_device_token] = useState("");
 
   const { signIn } = React.useContext(AuthContext);
 
-  const storeData = async (value) => {
+  const storeEmail = async (email) => {
     try {
-      await AsyncStorage.setItem("@logged_in_email", value);
+      await AsyncStorage.setItem("@logged_in_email", email);
     } catch (e) {
       // saving error
+      console.log(e);
     }
   };
 
-  function handleSubmit(email, password) {
-    SignInLogic(email, password).then((result) => {
+  function handleSubmit(email, password, device_token) {
+    SignInLogic(email, password, device_token).then((result) => {
       if (
         result.message == "Email does not exist" ||
         result.message == "Password is not correct"
       ) {
         return Alert.alert(result.message);
       } else if (result.status == "success") {
-        storeData(email);
+        storeEmail(email);
         return signIn({ email, password });
       }
     });
   }
+
+  useEffect(() => {
+    registerForPushNotificationsAsync();
+  }, []);
+
+  const registerForPushNotificationsAsync = async () => {
+    if (Constants.isDevice) {
+      const { status: existingStatus } = await Permissions.getAsync(
+        Permissions.NOTIFICATIONS
+      );
+      let finalStatus = existingStatus;
+      if (existingStatus !== "granted") {
+        const { status } = await Permissions.askAsync(
+          Permissions.NOTIFICATIONS
+        );
+        finalStatus = status;
+      }
+      if (finalStatus !== "granted") {
+        alert("Failed to get push token for push notification!");
+        return;
+      }
+      const token = (await Notifications.getExpoPushTokenAsync()).data;
+      set_device_token(token);
+    } else {
+      alert("Must use physical device for Push Notifications");
+    }
+
+    if (Platform.OS === "android") {
+      Notifications.setNotificationChannelAsync("default", {
+        name: "default",
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: "#FF231F7C",
+      });
+    }
+  };
 
   return (
     <View
@@ -97,7 +140,7 @@ export default function SignInScreen() {
 
         <TouchableOpacity
           style={{ margin: 15 }}
-          onPress={() => handleSubmit(email, password)}
+          onPress={() => handleSubmit(email, password, device_token)}
         >
           <LinearGradient
             start={[0, 0.5]}

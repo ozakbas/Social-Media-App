@@ -17,6 +17,28 @@ export default function CommentScreen({ route, navigation }) {
 
   const [commentArray, setcommentArray] = useState(route.params.item.comments);
 
+  function sendNotif(message, username, postId) {
+    var req = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        message: message,
+        username: username,
+        postId: postId,
+      }),
+    };
+
+    fetch("http://192.168.1.32:3000/mobile/expoNotification", req)
+      .then((response) => response.text())
+      .then((result) => JSON.parse(result))
+      .then((result) => {
+        console.log(result);
+      })
+
+      .catch((error) => console.log("error", error));
+  }
   function postComment() {
     var req = {
       method: "POST",
@@ -31,9 +53,10 @@ export default function CommentScreen({ route, navigation }) {
       }),
     };
 
-    fetch("http://192.168.1.27:3000/mobile/addComment", req)
+    fetch("http://192.168.1.32:3000/mobile/addComment", req)
       .then((response) => response.text())
       .then((result) => {
+        sendNotif("commented on your post.", username, post_id);
         console.log(result);
       })
       .catch((error) => console.log("error", error));

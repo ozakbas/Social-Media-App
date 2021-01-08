@@ -1,4 +1,4 @@
-import React, { Component, useState, useEffect, useRef } from "react";
+import React, { Component } from "react";
 import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
 import * as Permissions from "expo-permissions";
@@ -21,55 +21,30 @@ const DateComponent = (props) => {
 };
 
 export default class NotificationScreen extends Component {
+  _isMounted = false;
+
   constructor(props) {
     super(props);
 
     this.state = {
       email: "",
       notifications: [],
-      expoPushToken: "",
     };
   }
 
   componentDidMount() {
-    this.getData();
+    this._isMounted = true;
+    if (this._isMounted) {
+      this.getData();
+    }
     this.focusSubscription = this.props.navigation.addListener("focus", () => {
       this.getData();
     });
   }
 
-  registerForPushNotificationsAsync = async () => {
-    if (Constants.isDevice) {
-      const { status: existingStatus } = await Permissions.getAsync(
-        Permissions.NOTIFICATIONS
-      );
-      let finalStatus = existingStatus;
-      if (existingStatus !== "granted") {
-        const { status } = await Permissions.askAsync(
-          Permissions.NOTIFICATIONS
-        );
-        finalStatus = status;
-      }
-      if (finalStatus !== "granted") {
-        alert("Failed to get push token for push notification!");
-        return;
-      }
-      const token = (await Notifications.getExpoPushTokenAsync()).data;
-      console.log(token);
-      this.setState({ expoPushToken: token });
-    } else {
-      alert("Must use physical device for Push Notifications");
-    }
-
-    if (Platform.OS === "android") {
-      Notifications.setNotificationChannelAsync("default", {
-        name: "default",
-        importance: Notifications.AndroidImportance.MAX,
-        vibrationPattern: [0, 250, 250, 250],
-        lightColor: "#FF231F7C",
-      });
-    }
-  };
+  componentWillUnmount() {
+    this._isMounted = false;
+  }
 
   getNotifications(email) {
     var req = {
@@ -82,7 +57,7 @@ export default class NotificationScreen extends Component {
       }),
     };
 
-    fetch("http://192.168.1.27:3000/mobile/showNotifications", req)
+    fetch("http://192.168.1.32:3000/mobile/showNotifications", req)
       .then((response) => response.text())
       .then((result) => JSON.parse(result))
       .then((result) => {
@@ -97,7 +72,6 @@ export default class NotificationScreen extends Component {
       const value = await AsyncStorage.getItem("@logged_in_email");
       this.getNotifications(value);
       this.setState({ email: value });
-      this.registerForPushNotificationsAsync();
 
       if (value !== null) {
         // value previously stored
@@ -107,28 +81,6 @@ export default class NotificationScreen extends Component {
       console.log(e);
     }
   };
-
-  sendNotif(token, message) {
-    var req = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        expo_token: token,
-        message: message,
-      }),
-    };
-
-    fetch("http://192.168.1.27:3000/mobile/expoNotification", req)
-      .then((response) => response.text())
-      .then((result) => JSON.parse(result))
-      .then((result) => {
-        console.log(result);
-      })
-
-      .catch((error) => console.log("error", error));
-  }
 
   openPost(email, postId) {
     var req = {
@@ -142,7 +94,7 @@ export default class NotificationScreen extends Component {
       }),
     };
 
-    fetch("http://192.168.1.27:3000/mobile/notificationRead", req)
+    fetch("http://192.168.1.32:3000/mobile/notificationRead", req)
       .then((response) => response.text())
       .then((result) => JSON.parse(result))
       .then((result) => {
@@ -196,13 +148,6 @@ export default class NotificationScreen extends Component {
 
     return (
       <ScrollView>
-        <TouchableOpacity
-          onPress={() =>
-            this.sendNotif(this.state.expoPushToken, "umut liked your message!")
-          }
-        >
-          <Text>try the notification</Text>
-        </TouchableOpacity>
         {notifications.length != 0 && (
           <View style={{ marginBottom: 20 }}>
             <Text style={styles.title}>New notifications</Text>
