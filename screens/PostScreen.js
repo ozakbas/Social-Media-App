@@ -5,34 +5,7 @@ import * as Permissions from "expo-permissions";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { LinearGradient } from "expo-linear-gradient";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
-export function submitPostLogic(email, caption, topics, location, image) {
-  return new Promise((resolve, reject) => {
-    var req = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: email,
-        caption: caption,
-        topics: topics,
-        location: location,
-        // image: image,
-      }),
-    };
-
-    fetch("http://192.168.1.32:3000/mobile/addPost", req)
-      .then((response) => response.text())
-      .then((result) => {
-        resolve(result);
-      })
-      .catch((error) => {
-        console.log("error", error);
-        reject();
-      });
-  });
-}
+import { postRequest } from "../fetchComponents";
 
 export default function PostScreen({ navigation }) {
   const [email, setemail] = useState("");
@@ -61,8 +34,14 @@ export default function PostScreen({ navigation }) {
   }, []);
 
   function submitPost() {
-    submitPostLogic(email, caption, topics, location, image);
-
+    var data = {
+      email: email,
+      caption: caption,
+      topics: topics,
+      location: location,
+      // image: image,
+    };
+    postRequest(data, "addPost", true);
     navigation.goBack();
   }
 

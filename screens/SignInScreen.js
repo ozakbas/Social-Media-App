@@ -15,35 +15,7 @@ import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
 import * as Permissions from "expo-permissions";
 
-export function SignInLogic(email, password, device_token) {
-  return new Promise((resolve, reject) => {
-    var data = {
-      email: email,
-      password: password,
-      device_token: device_token,
-    };
-
-    var req = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    };
-
-    var myUrl = "http://192.168.1.32:3000/login";
-
-    fetch(myUrl, req)
-      .then((response) => response.text())
-      .then((result) => JSON.parse(result))
-      .then((result) => {
-        resolve(result);
-      })
-      .catch((error) => {
-        reject(error);
-      });
-  });
-}
+import { postRequest } from "../fetchComponents";
 
 export default function SignInScreen() {
   const [email, setEmail] = useState();
@@ -62,7 +34,13 @@ export default function SignInScreen() {
   };
 
   function handleSubmit(email, password, device_token) {
-    SignInLogic(email, password, device_token).then((result) => {
+    var data = {
+      email: email,
+      password: password,
+      device_token: device_token,
+    };
+
+    postRequest(data, "login", true).then((result) => {
       if (
         result.message == "Email does not exist" ||
         result.message == "Password is not correct"

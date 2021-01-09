@@ -14,38 +14,7 @@ import { AuthContext } from "../context/auth-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
 import { useEffect } from "react";
-
-export function SignUpLogic(username, email, password, device_token) {
-  return new Promise((resolve, reject) => {
-    var data = {
-      username: username,
-      email: email,
-      password: password,
-      device_token: device_token,
-    };
-
-    var req = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    };
-
-    var myUrl = "http://192.168.1.32:3000/mobile/signup";
-
-    fetch(myUrl, req)
-      .then((response) => response.text())
-      .then((result) => JSON.parse(result))
-      .then((result) => {
-        resolve(result);
-      })
-      .catch((error) => {
-        console.log("error", error);
-        reject();
-      });
-  });
-}
+import { postRequest } from "../fetchComponents";
 
 export default function SignUpScreen() {
   const [username, setUsername] = useState("");
@@ -59,7 +28,7 @@ export default function SignUpScreen() {
     registerForPushNotificationsAsync();
   }, []);
 
-  const storEmail = async (email) => {
+  const storeEmail = async (email) => {
     try {
       await AsyncStorage.setItem("@logged_in_email", email);
     } catch (e) {
@@ -101,7 +70,13 @@ export default function SignUpScreen() {
   };
 
   function handleSubmit(username, email, password, device_token) {
-    SignUpLogic(username, email, password, device_token).then((result) => {
+    var data = {
+      username: username,
+      email: email,
+      password: password,
+      device_token: device_token,
+    };
+    postRequest(data, "signup", true).then((result) => {
       if (result.message == "Email or username already exist.")
         return Alert.alert(result.message);
       else if (result.message == "Signed up successfully. You can login now.") {

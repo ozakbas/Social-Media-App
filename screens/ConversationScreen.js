@@ -12,8 +12,19 @@ import io from "socket.io-client";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "react-native-vector-icons/Ionicons";
 
-export class ConversationLogic {
-  static getUserInfo(email) {
+export default class Conversation extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      username: "",
+      chatMessage: "",
+      chatMessages: props.route.params.item.messages,
+      chatId: props.route.params.item.chatId,
+
+      person: this.props.route.params.item.person[0],
+    };
+  }
+  fetchUserInfo(email) {
     return new Promise((resolve, reject) => {
       var data = {
         email: email,
@@ -44,23 +55,9 @@ export class ConversationLogic {
         });
     });
   }
-}
-
-export default class Conversation extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      username: "",
-      chatMessage: "",
-      chatMessages: props.route.params.item.messages,
-      chatId: props.route.params.item.chatId,
-
-      person: this.props.route.params.item.person[0],
-    };
-  }
 
   getUserInfo(email) {
-    ConversationLogic.getUserInfo(email).then((result) => {
+    this.fetchUserInfo(email).then((result) => {
       this.setState({ username: result.user.username });
     });
   }

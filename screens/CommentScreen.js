@@ -8,6 +8,7 @@ import {
   FlatList,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
+import { postRequest } from "../fetchComponents";
 
 export default function CommentScreen({ route, navigation }) {
   const [id, setId] = useState(route.params.id);
@@ -16,51 +17,26 @@ export default function CommentScreen({ route, navigation }) {
   const [comment, setcomment] = useState("");
 
   const [commentArray, setcommentArray] = useState(route.params.item.comments);
-
   function sendNotif(message, username, postId) {
-    var req = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        message: message,
-        username: username,
-        postId: postId,
-      }),
+    var data = {
+      message: message,
+      username: username,
+      postId: postId,
     };
-
-    fetch("http://192.168.1.32:3000/mobile/expoNotification", req)
-      .then((response) => response.text())
-      .then((result) => JSON.parse(result))
-      .then((result) => {
-        console.log(result);
-      })
-
-      .catch((error) => console.log("error", error));
+    postRequest(data, "expoNotification", true);
   }
+
   function postComment() {
-    var req = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        postId: postId,
-        userId: id,
-        username: username,
-        comment: comment,
-      }),
+    var data = {
+      postId: postId,
+      userId: id,
+      username: username,
+      comment: comment,
     };
-
-    fetch("http://192.168.1.32:3000/mobile/addComment", req)
-      .then((response) => response.text())
-      .then((result) => {
-        sendNotif("commented on your post.", username, post_id);
-        console.log(result);
-      })
-      .catch((error) => console.log("error", error));
-
+    postRequest(data, "addComment", false).then((result) => {
+      sendNotif("commented on your post.", username, postId);
+      console.log(result);
+    });
     navigation.goBack();
   }
 

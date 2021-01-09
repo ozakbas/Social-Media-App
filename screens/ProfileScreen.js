@@ -15,260 +15,144 @@ import Icon from "react-native-vector-icons/Ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 
 import { AuthContext } from "../context/auth-context";
+import { postRequest } from "../fetchComponents";
 
-export class ProfileLogic {
-  static like(email, post_id) {
-    return new Promise((resolve, reject) => {
-      var req = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+export default function ProfileScreen({ navigation }) {
+  const { signOut } = React.useContext(AuthContext);
+
+  const [username, setUsername] = useState("");
+  const [id, setId] = useState("");
+  const [email, setEmail] = useState("");
+  const [profileImage, setProfileImage] = useState("");
+  const [posts, setPosts] = useState([]);
+
+  const [connections, setConnections] = useState([]);
+  const [topics, setTopics] = useState([]);
+  const [locations, setLocations] = useState([]);
+
+  const [ModalVisibility, setModalVisibility] = useState(false);
+  const [ModalVisibility2, setModalVisibility2] = useState(false);
+  const [ModalVisibility3, setModalVisibility3] = useState(false);
+
+  const [refresh, setRefresh] = useState(false);
+
+  const [addConnection, setAddConnection] = useState("");
+  const [addTopic, setAddTopic] = useState("");
+  const [addLocation, setAddLocation] = useState("");
+
+  function like(email, post_id) {
+    var data = {
+      email: email,
+      postId: post_id,
+    };
+    postRequest(data, "like", false);
+    setRefresh(true);
+  }
+
+  function dislike(email, post_id) {
+    var data = {
+      email: email,
+      postId: post_id,
+    };
+    setRefresh(true);
+    postRequest(data, "dislike", false);
+  }
+
+  function submitConnection(email, addConnection) {
+    var data = {
+      email: email,
+      username: addConnection,
+    };
+    setModalVisibility(false);
+    setRefresh(true);
+    setAddConnection("");
+    postRequest(data, "addConnection", false);
+  }
+
+  function submitTopic(email, addTopic) {
+    var data = {
+      email: email,
+      topic: addTopic,
+    };
+
+    postRequest(data, "subscribeTopic", false);
+    setModalVisibility2(false);
+    setRefresh(true);
+    setAddTopic("");
+  }
+
+  function deletePost(email, post_id) {
+    var data = {
+      email: email,
+      _id: post_id,
+    };
+    postRequest(data, "deletePost", false);
+    setRefresh(true);
+  }
+
+  function deleteAlert(post_id) {
+    Alert.alert(
+      "Are you sure?",
+      "Your post will be deleted forever if you press OK.",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
         },
-        body: JSON.stringify({
-          email: email,
-          postId: post_id,
-        }),
-      };
+        { text: "OK", onPress: () => deletePost(email, post_id) },
+      ],
+      { cancelable: false }
+    );
+  }
 
-      fetch("http://192.168.1.32:3000/mobile/like", req)
-        .then((response) => response.text())
-        .then((result) => {
-          resolve(result);
-        })
-        .catch((error) => {
-          console.log("error", error);
-          reject();
-        });
+  function deleteTopic(email, topic) {
+    var data = {
+      email: email,
+      topic: topic,
+    };
+    postRequest(data, "unsubscribeTopic", false);
+    setRefresh(true);
+  }
+
+  function deleteLocation(email, location) {
+    var data = {
+      email: email,
+      location: location,
+    };
+    postRequest(data, "unsubscribeLocation", false);
+    setRefresh(true);
+  }
+
+  function deleteConnection(email, connection) {
+    var data = {
+      email: email,
+      connection: connection,
+    };
+    postRequest(data, "deleteConnection", false);
+    setRefresh(true);
+  }
+
+  function submitLocation(email, addLocation) {
+    var data = {
+      email: email,
+      location: addLocation,
+    };
+    postRequest(data, "subscribeLocation", false);
+
+    setAddLocation("");
+    setModalVisibility3(false);
+    setRefresh(true);
+  }
+
+  function getPosts(id) {
+    var data = { id: id };
+    postRequest(data, "showMyPosts", true).then((result) => {
+      setPosts(result.posts.reverse());
     });
   }
 
-  static dislike(email, post_id) {
-    return new Promise((resolve, reject) => {
-      var req = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: email,
-          postId: post_id,
-        }),
-      };
-
-      fetch("http://192.168.1.32:3000/mobile/dislike", req)
-        .then((response) => response.text())
-        .then((result) => {
-          resolve(result);
-        })
-        .catch((error) => {
-          console.log("error", error);
-          reject();
-        });
-    });
-  }
-
-  static submitConnection(email, addConnection) {
-    return new Promise((resolve, reject) => {
-      var req = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: email,
-          username: addConnection,
-        }),
-      };
-
-      fetch("http://192.168.1.32:3000/mobile/addConnection", req)
-        .then((response) => response.text())
-        .then((result) => {
-          resolve(result);
-        })
-        .catch((error) => {
-          console.log("error", error);
-          reject();
-        });
-    });
-  }
-
-  static submitTopic(email, addTopic) {
-    return new Promise((resolve, reject) => {
-      var req = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: email,
-          topic: addTopic,
-        }),
-      };
-
-      fetch("http://192.168.1.32:3000/mobile/subscribeTopic", req)
-        .then((response) => response.text())
-        .then((result) => {
-          resolve(result);
-        })
-        .catch((error) => {
-          console.log("error", error);
-          reject();
-        });
-    });
-  }
-
-  static deletePost(email, post_id) {
-    return new Promise((resolve, reject) => {
-      var req = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: email,
-          _id: post_id,
-        }),
-      };
-
-      fetch("http://192.168.1.32:3000/mobile/deletePost", req)
-        .then((response) => response.text())
-        .then((result) => {
-          resolve(result);
-        })
-        .catch((error) => {
-          console.log("error", error);
-          reject();
-        });
-    });
-  }
-
-  static deleteTopic(email, topic) {
-    return new Promise((resolve, reject) => {
-      var req = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: email,
-          topic: topic,
-        }),
-      };
-
-      fetch("http://192.168.1.32:3000/mobile/unsubscribeTopic", req)
-        .then((response) => response.text())
-        .then((result) => JSON.parse(result))
-        .then((result) => {
-          resolve(result);
-        })
-        .catch((error) => {
-          console.log("error", error);
-          reject();
-        });
-    });
-  }
-
-  static deleteLocation(email, location) {
-    return new Promise((resolve, reject) => {
-      var req = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: email,
-          location: location,
-        }),
-      };
-
-      fetch("http://192.168.1.32:3000/mobile/unsubscribeLocation", req)
-        .then((response) => response.text())
-        .then((result) => JSON.parse(result))
-        .then((result) => {
-          resolve(result);
-        })
-        .catch((error) => {
-          console.log("error", error);
-          reject();
-        });
-    });
-  }
-
-  static deleteConnection(email, connection) {
-    return new Promise((resolve, reject) => {
-      var req = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: email,
-          connection: connection,
-        }),
-      };
-
-      fetch("http://192.168.1.32:3000/mobile/deleteConnection", req)
-        .then((response) => response.text())
-        .then((result) => JSON.parse(result))
-        .then((result) => {
-          resolve(result);
-        })
-        .catch((error) => {
-          console.log("error", error);
-          reject();
-        });
-    });
-  }
-
-  static submitLocation(email, addLocation) {
-    return new Promise((resolve, reject) => {
-      var req = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: email,
-          location: addLocation,
-        }),
-      };
-
-      fetch("http://192.168.1.32:3000/mobile/subscribeLocation", req)
-        .then((response) => response.text())
-        .then((result) => {
-          resolve(result);
-        })
-        .catch((error) => {
-          console.log("error", error);
-          reject();
-        });
-    });
-  }
-
-  static getPosts(id) {
-    return new Promise((resolve, reject) => {
-      var req = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ id: id }),
-      };
-
-      fetch(`http://192.168.1.32:3000/mobile/showMyPosts`, req)
-        .then((response) => response.text())
-        .then((result) => JSON.parse(result))
-        .then((result) => {
-          resolve(result);
-        })
-        .catch((error) => {
-          console.log("error", error);
-          reject();
-        });
-    });
-  }
-
-  static getUserInfo(email) {
+  function fetchUserInfo(email) {
     return new Promise((resolve, reject) => {
       var data = {
         email: email,
@@ -299,106 +183,9 @@ export class ProfileLogic {
         });
     });
   }
-}
-
-export default function ProfileScreen({ navigation }) {
-  const { signOut } = React.useContext(AuthContext);
-
-  const [username, setUsername] = useState("");
-  const [id, setId] = useState("");
-  const [email, setEmail] = useState("");
-  const [profileImage, setProfileImage] = useState("");
-  const [posts, setPosts] = useState([]);
-
-  const [connections, setConnections] = useState([]);
-  const [topics, setTopics] = useState([]);
-  const [locations, setLocations] = useState([]);
-
-  const [ModalVisibility, setModalVisibility] = useState(false);
-  const [ModalVisibility2, setModalVisibility2] = useState(false);
-  const [ModalVisibility3, setModalVisibility3] = useState(false);
-
-  const [refresh, setRefresh] = useState(false);
-
-  const [addConnection, setAddConnection] = useState("");
-  const [addTopic, setAddTopic] = useState("");
-  const [addLocation, setAddLocation] = useState("");
-
-  function like(email, post_id) {
-    setRefresh(true);
-    ProfileLogic.like(email, post_id);
-  }
-
-  function dislike(email, post_id) {
-    setRefresh(true);
-    ProfileLogic.dislike(email, post_id);
-  }
-
-  function submitConnection(email, addConnection) {
-    setModalVisibility(false);
-    setRefresh(true);
-    setAddConnection("");
-    ProfileLogic.submitConnection(email, addConnection);
-  }
-
-  function submitTopic(email, addTopic) {
-    setModalVisibility2(false);
-    setRefresh(true);
-    setAddTopic("");
-    ProfileLogic.submitTopic(email, addTopic);
-  }
-
-  function deletePost(email, post_id) {
-    setRefresh(true);
-    ProfileLogic.deletePost(email, post_id);
-  }
-
-  function deleteAlert(post_id) {
-    Alert.alert(
-      "Are you sure?",
-      "Your post will be deleted forever if you press OK.",
-      [
-        {
-          text: "Cancel",
-          onPress: () => console.log("Cancel Pressed"),
-          style: "cancel",
-        },
-        { text: "OK", onPress: () => deletePost(email, post_id) },
-      ],
-      { cancelable: false }
-    );
-  }
-
-  function deleteTopic(email, topic) {
-    setRefresh(true);
-    ProfileLogic.deleteTopic(email, topic);
-  }
-
-  function deleteLocation(email, location) {
-    setRefresh(true);
-    ProfileLogic.deleteLocation(email, location);
-  }
-
-  function deleteConnection(email, connection) {
-    setRefresh(true);
-    ProfileLogic.deleteConnection(email, connection);
-  }
-
-  function submitLocation(email, addLocation) {
-    setAddLocation("");
-    setModalVisibility3(false);
-    setRefresh(true);
-    ProfileLogic.submitLocation(email, addLocation);
-  }
-
-  function getPosts(id) {
-    ProfileLogic.getPosts(id).then((result) => {
-      setPosts(result.posts.reverse());
-    });
-  }
 
   function getUserInfo(email) {
-    ProfileLogic.getUserInfo(email).then((result) => {
+    fetchUserInfo(email).then((result) => {
       setId(result.user._id);
       setUsername(result.user.username);
       setProfileImage(result.user.profileImage);

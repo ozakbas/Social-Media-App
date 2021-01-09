@@ -11,80 +11,109 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "react-native-vector-icons/Ionicons";
 import { LinearGradient } from "expo-linear-gradient";
+import { postRequest } from "../fetchComponents";
 
-export class HomeLogic {
-  static sendNotif(message, username, postId) {
+export default function HomeScreen({ navigation }) {
+  const [username, setUsername] = useState("");
+  const [id, setId] = useState("");
+  const [email, setEmail] = useState("");
+  const [posts, setPosts] = useState([]);
+
+  const [refresh, setRefresh] = useState(false);
+
+  function sendNotif(message, username, postId) {
+    var data = {
+      message: message,
+      username: username,
+      postId: postId,
+    };
+    postRequest(data, "expoNotification", true);
+  }
+
+  function report(post_id) {
     var req = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        message: message,
-        username: username,
-        postId: postId,
+        postid: post_id,
       }),
     };
-
-    fetch("http://192.168.1.32:3000/mobile/expoNotification", req)
+    fetch("http://192.168.1.32:3000/mailSend", req)
       .then((response) => response.text())
-      .then((result) => JSON.parse(result))
       .then((result) => {
         console.log(result);
       })
-
       .catch((error) => console.log("error", error));
   }
-  static like(email, post_id, username) {
-    return new Promise((resolve, reject) => {
-      var req = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: email,
-          postId: post_id,
-        }),
-      };
 
-      fetch("http://192.168.1.32:3000/mobile/like", req)
-        .then((response) => response.text())
-        .then((result) => {
-          this.sendNotif("liked your post", username, post_id);
-          resolve(result);
-        })
-        .catch((error) => {
-          console.log("error", error);
-          reject();
-        });
+  function like(email, post_id, username) {
+    var data = {
+      email: email,
+      postId: post_id,
+    };
+    setRefresh(true);
+    postRequest(data, "like", false).then((result) => {
+      sendNotif("liked your post", username, post_id);
     });
   }
-  static dislike(email, post_id) {
-    return new Promise((resolve, reject) => {
-      var req = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: email,
-          postId: post_id,
-        }),
-      };
 
-      fetch("http://192.168.1.32:3000/mobile/dislike", req)
-        .then((response) => response.text())
-        .then((result) => {
-          resolve(result);
-        })
-        .catch((error) => {
-          console.log("error", error);
-          reject();
-        });
+  function dislike(email, post_id, username) {
+    var data = {
+      email: email,
+      postId: post_id,
+    };
+    postRequest(data, "dislike", false).then((result) => {
+      sendNotif("disliked your post", username, post_id);
+    });
+    setRefresh(true);
+  }
+
+  function getFeed(value) {
+    var req = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: value,
+      }),
+    };
+
+    fetch("http://192.168.1.32:3000/mobile/getNewsfeed", req)
+      .then((response) => response.text())
+      .then((result) => JSON.parse(result))
+      .then((result) => {
+        setPosts(result.data);
+      })
+      .catch((error) => console.log("error", error));
+  }
+
+  function getUserInfo(email) {
+    fetchUserInfo(email).then((result) => {
+      setId(result.user._id);
+      setUsername(result.user.username);
     });
   }
-  static getUserInfo(email) {
+  const getData = async () => {
+    console.log("getdata workin");
+    try {
+      const value = await AsyncStorage.getItem("@logged_in_email");
+      setEmail(value);
+      getFeed(value);
+      getUserInfo(value);
+
+      if (value !== null) {
+        // value previously stored
+      }
+    } catch (e) {
+      // error reading value
+      console.log(e);
+    }
+  };
+
+  function fetchUserInfo(email) {
     return new Promise((resolve, reject) => {
       var data = {
         email: email,
@@ -115,86 +144,6 @@ export class HomeLogic {
         });
     });
   }
-}
-
-export default function HomeScreen({ navigation }) {
-  const [username, setUsername] = useState("");
-  const [id, setId] = useState("");
-  const [email, setEmail] = useState("");
-  const [posts, setPosts] = useState([]);
-
-  const [refresh, setRefresh] = useState(false);
-
-  function report(post_id) {
-    var req = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        postid: post_id,
-      }),
-    };
-    fetch("http://192.168.1.32:3000/mailSend", req)
-      .then((response) => response.text())
-      .then((result) => {
-        console.log(result);
-      })
-      .catch((error) => console.log("error", error));
-  }
-
-  function like(email, post_id, username) {
-    setRefresh(true);
-    HomeLogic.like(email, post_id, username);
-  }
-
-  function dislike(email, post_id) {
-    setRefresh(true);
-    HomeLogic.dislike(email, post_id);
-  }
-
-  function getFeed(value) {
-    var req = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: value,
-      }),
-    };
-
-    fetch("http://192.168.1.32:3000/mobile/getNewsfeed", req)
-      .then((response) => response.text())
-      .then((result) => JSON.parse(result))
-      .then((result) => {
-        setPosts(result.data);
-      })
-      .catch((error) => console.log("error", error));
-  }
-
-  function getUserInfo(email) {
-    HomeLogic.getUserInfo(email).then((result) => {
-      setId(result.user._id);
-      setUsername(result.user.username);
-    });
-  }
-  const getData = async () => {
-    console.log("getdata workin");
-    try {
-      const value = await AsyncStorage.getItem("@logged_in_email");
-      setEmail(value);
-      getFeed(value);
-      getUserInfo(value);
-
-      if (value !== null) {
-        // value previously stored
-      }
-    } catch (e) {
-      // error reading value
-      console.log(e);
-    }
-  };
 
   useEffect(() => {
     getData();
@@ -295,7 +244,7 @@ export default function HomeScreen({ navigation }) {
             style={{
               alignSelf: "center",
             }}
-            onPress={() => dislike(email, item._id)}
+            onPress={() => dislike(email, item._id, username)}
           >
             <Icon name="md-thumbs-down" color={"#B5493E"} size={26} />
           </TouchableOpacity>

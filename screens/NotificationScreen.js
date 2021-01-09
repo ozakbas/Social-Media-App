@@ -12,6 +12,7 @@ import {
 import { formatRelative } from "date-fns";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ScrollView } from "react-native-gesture-handler";
+import { postRequest } from "../fetchComponents";
 
 const DateComponent = (props) => {
   var utcSeconds = props.item.createdAt;
@@ -21,8 +22,6 @@ const DateComponent = (props) => {
 };
 
 export default class NotificationScreen extends Component {
-  _isMounted = false;
-
   constructor(props) {
     super(props);
 
@@ -33,33 +32,18 @@ export default class NotificationScreen extends Component {
   }
 
   componentDidMount() {
-    this._isMounted = true;
-    if (this._isMounted) {
-      this.getData();
-    }
+    this.getData();
+
     this.focusSubscription = this.props.navigation.addListener("focus", () => {
       this.getData();
     });
   }
 
-  componentWillUnmount() {
-    this._isMounted = false;
-  }
-
   getNotifications(email) {
-    var req = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: email,
-      }),
+    var data = {
+      email: email,
     };
-
-    fetch("http://192.168.1.32:3000/mobile/showNotifications", req)
-      .then((response) => response.text())
-      .then((result) => JSON.parse(result))
+    postRequest(data, "showNotifications", true)
       .then((result) => {
         this.setState({ notifications: result.data.reverse() });
       })
@@ -83,25 +67,12 @@ export default class NotificationScreen extends Component {
   };
 
   openPost(email, postId) {
-    var req = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: email,
-        id: postId,
-      }),
+    var data = {
+      email: email,
+      id: postId,
     };
 
-    fetch("http://192.168.1.32:3000/mobile/notificationRead", req)
-      .then((response) => response.text())
-      .then((result) => JSON.parse(result))
-      .then((result) => {
-        console.log(result);
-      })
-
-      .catch((error) => console.log("error", error));
+    postRequest(data, "notificationRead", false);
   }
 
   render() {

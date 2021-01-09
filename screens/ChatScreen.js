@@ -11,59 +11,7 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
-
-export class ChatLogic {
-  static createConversation(email, person) {
-    return new Promise((resolve, reject) => {
-      var req = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: email,
-          username: person,
-        }),
-      };
-
-      fetch("http://192.168.1.32:3000/mobile/addChat", req)
-        .then((response) => response.text())
-        .then((result) => JSON.parse(result))
-        .then((result) => {
-          resolve(result);
-        })
-        .catch((error) => {
-          console.log("error", error);
-          reject();
-        });
-    });
-  }
-
-  static getConversations(value) {
-    return new Promise((resolve, reject) => {
-      var req = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: value,
-        }),
-      };
-
-      fetch("http://192.168.1.32:3000/mobile/showMyChats", req)
-        .then((response) => response.text())
-        .then((result) => JSON.parse(result))
-        .then((result) => {
-          resolve(result);
-        })
-        .catch((error) => {
-          console.log("error", error);
-          reject();
-        });
-    });
-  }
-}
+import { postRequest } from "../fetchComponents";
 
 export default class ChatScreen extends Component {
   constructor(props) {
@@ -77,7 +25,11 @@ export default class ChatScreen extends Component {
   }
 
   createConversation(email, person) {
-    ChatLogic.createConversation(email, person).then(() => {
+    var data = {
+      email: email,
+      username: person,
+    };
+    postRequest(data, "addChat", true).then(() => {
       this.getData();
     });
 
@@ -85,7 +37,10 @@ export default class ChatScreen extends Component {
   }
 
   getConversations(value) {
-    ChatLogic.getConversations(this.state.email).then((result) => {
+    var data = {
+      email: value,
+    };
+    postRequest(data, "showMyChats", true).then((result) => {
       this.setState({ conversations: result.data });
     });
   }
