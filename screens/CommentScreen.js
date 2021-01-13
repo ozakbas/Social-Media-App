@@ -11,9 +11,9 @@ import Icon from "react-native-vector-icons/Ionicons";
 import { postRequest } from "../fetchComponents";
 
 export default function CommentScreen({ route, navigation }) {
-  const [id, setId] = useState(route.params.id);
+  const [id, setId] = useState(route.params.loggedInId);
   const [postId, setpostId] = useState(route.params.item._id);
-  const [username, setUsername] = useState(route.params.username);
+  const [username, setUsername] = useState(route.params.loggedInUsername);
   const [comment, setcomment] = useState("");
 
   const [commentArray, setcommentArray] = useState(route.params.item.comments);

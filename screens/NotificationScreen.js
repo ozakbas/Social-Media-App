@@ -1,7 +1,4 @@
 import React, { Component } from "react";
-import Constants from "expo-constants";
-import * as Notifications from "expo-notifications";
-import * as Permissions from "expo-permissions";
 import {
   View,
   Text,
@@ -66,13 +63,21 @@ export default class NotificationScreen extends Component {
     }
   };
 
-  openPost(email, postId) {
+  openPost(email, notifId, postId) {
     var data = {
       email: email,
-      id: postId,
+      id: notifId,
     };
 
+    console.log(notifId);
+    console.log(postId);
+
     postRequest(data, "notificationRead", false);
+    this.props.navigation.navigate("SinglePost", { postId });
+  }
+
+  openOldPost(postId) {
+    this.props.navigation.navigate("SinglePost", { postId });
   }
 
   render() {
@@ -82,7 +87,9 @@ export default class NotificationScreen extends Component {
       })
       .map((item) => (
         <TouchableOpacity
-          onPress={() => this.openPost(this.state.email, item._id)}
+          onPress={() =>
+            this.openPost(this.state.email, item._id, item.post._id)
+          }
           key={item._id}
           style={{
             backgroundColor: "grey",
@@ -102,7 +109,7 @@ export default class NotificationScreen extends Component {
       })
       .map((item) => (
         <TouchableOpacity
-          onPress={() => console.log(item.post._id)}
+          onPress={() => this.openOldPost(item.post._id)}
           key={item._id}
           style={{
             backgroundColor: "grey",

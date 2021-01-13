@@ -14,18 +14,18 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "react-native-vector-icons/Ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 
-import { AuthContext } from "../context/auth-context";
 import { postRequest } from "../fetchComponents";
 import { getRequest } from "../fetchComponents";
 
-export default function ProfileScreen({ navigation }) {
-  const { signOut } = React.useContext(AuthContext);
-
+export default function otherProfileScreen({ route, navigation }) {
   const [username, setUsername] = useState("");
   const [id, setId] = useState("");
   const [email, setEmail] = useState("");
   const [profileImage, setProfileImage] = useState("");
   const [posts, setPosts] = useState([]);
+
+  const [loggedInUsername, setLoggedInUsername] = useState("");
+  const [loggedInId, setLoggedInId] = useState("");
 
   const [connections, setConnections] = useState([]);
   const [topics, setTopics] = useState([]);
@@ -36,10 +36,6 @@ export default function ProfileScreen({ navigation }) {
   const [ModalVisibility3, setModalVisibility3] = useState(false);
 
   const [refresh, setRefresh] = useState(false);
-
-  const [addConnection, setAddConnection] = useState("");
-  const [addTopic, setAddTopic] = useState("");
-  const [addLocation, setAddLocation] = useState("");
 
   function like(email, post_id) {
     var data = {
@@ -59,93 +55,6 @@ export default function ProfileScreen({ navigation }) {
     postRequest(data, "dislike", false);
   }
 
-  function deletePost(email, post_id) {
-    var data = {
-      email: email,
-      _id: post_id,
-    };
-    postRequest(data, "deletePost", false);
-    setRefresh(true);
-  }
-
-  function deleteAlert(post_id) {
-    Alert.alert(
-      "Are you sure?",
-      "Your post will be deleted forever if you press OK.",
-      [
-        {
-          text: "Cancel",
-          onPress: () => console.log("Cancel Pressed"),
-          style: "cancel",
-        },
-        { text: "OK", onPress: () => deletePost(email, post_id) },
-      ],
-      { cancelable: false }
-    );
-  }
-
-  function submitConnection(email, addConnection) {
-    var data = {
-      email: email,
-      username: addConnection,
-    };
-    setModalVisibility(false);
-    setRefresh(true);
-    setAddConnection("");
-    postRequest(data, "addConnection", false);
-  }
-
-  function submitTopic(email, addTopic) {
-    var data = {
-      email: email,
-      topic: addTopic,
-    };
-
-    postRequest(data, "subscribeTopic", false);
-    setModalVisibility2(false);
-    setRefresh(true);
-    setAddTopic("");
-  }
-
-  function deleteTopic(email, topic) {
-    var data = {
-      email: email,
-      topic: topic,
-    };
-    postRequest(data, "unsubscribeTopic", false);
-    setRefresh(true);
-  }
-
-  function deleteLocation(email, location) {
-    var data = {
-      email: email,
-      location: location,
-    };
-    postRequest(data, "unsubscribeLocation", false);
-    setRefresh(true);
-  }
-
-  function deleteConnection(email, connection) {
-    var data = {
-      email: email,
-      connection: connection,
-    };
-    postRequest(data, "deleteConnection", false);
-    setRefresh(true);
-  }
-
-  function submitLocation(email, addLocation) {
-    var data = {
-      email: email,
-      location: addLocation,
-    };
-    postRequest(data, "subscribeLocation", false);
-
-    setAddLocation("");
-    setModalVisibility3(false);
-    setRefresh(true);
-  }
-
   function getPosts(id) {
     var data = { id: id };
     postRequest(data, "showMyPosts", true).then((result) => {
@@ -153,25 +62,38 @@ export default function ProfileScreen({ navigation }) {
     });
   }
 
-  function getUserInfo(email) {
-    getRequest(email).then((result) => {
-      setId(result.user._id);
-      setUsername(result.user.username);
-      setProfileImage(result.user.profileImage);
-      setConnections(result.user.friends);
-      setLocations(result.user.locations);
-      setTopics(result.user.topics);
-      getPosts(result.user._id);
-    });
+  function report(post_id) {
+    var data = {
+      postid: post_id,
+    };
+    postRequest(data, "mailSend", false);
+  }
+
+  function getUserInfo() {
+    setId(route.params.item._id);
+    setUsername(route.params.item.username);
+    setProfileImage(route.params.item.profileImage);
+    setConnections(route.params.item.friends);
+    setLocations(route.params.item.locations);
+    setTopics(route.params.item.topics);
+    getPosts(route.params.item._id);
   }
 
   const getData = async () => {
     try {
-      const value = await AsyncStorage.getItem("@logged_in_email");
-      setEmail(value);
-      getUserInfo(value);
+      const email = await AsyncStorage.getItem("@logged_in_email");
+      const loggedInUsername = await AsyncStorage.getItem(
+        "@logged_in_username"
+      );
+      const loggedInId = await AsyncStorage.getItem("@logged_in_id");
 
-      if (value !== null) {
+      setEmail(email);
+      setLoggedInUsername(loggedInUsername);
+      setLoggedInId(loggedInId);
+
+      getUserInfo();
+
+      if (email !== null) {
         // value previously stored
       }
     } catch (e) {
@@ -195,22 +117,6 @@ export default function ProfileScreen({ navigation }) {
 
   const Bio = () => (
     <View style={{ margin: 10 }}>
-      <TouchableOpacity
-        style={{ width: 120, alignSelf: "flex-end" }}
-        onPress={() => signOut({ email })}
-      >
-        <LinearGradient
-          start={[0, 0.5]}
-          end={[1, 0.5]}
-          colors={["#5f2c82", "#49a09d"]}
-          style={{ borderRadius: 15 }}
-        >
-          <View style={styles.circleGradient}>
-            <Text style={styles.visit}>Sign out 👋🏼 </Text>
-          </View>
-        </LinearGradient>
-      </TouchableOpacity>
-
       <View
         style={{
           flex: 1,
@@ -259,22 +165,6 @@ export default function ProfileScreen({ navigation }) {
           <Text>locations</Text>
         </TouchableOpacity>
       </View>
-      <View
-        style={{
-          margin: 20,
-          alignItems: "center",
-          borderRadius: 15,
-          borderColor: "#B39E8D",
-          borderWidth: 3,
-          padding: 5,
-        }}
-      >
-        <TouchableOpacity onPress={() => navigation.navigate("Post")}>
-          <Text style={{ fontSize: 15, fontWeight: "700", color: "#393939" }}>
-            CREATE A NEW POST
-          </Text>
-        </TouchableOpacity>
-      </View>
 
       <View style={{ marginTop: 20 }}>
         <Text
@@ -286,7 +176,7 @@ export default function ProfileScreen({ navigation }) {
             margin: 10,
           }}
         >
-          My Posts
+          Posts
         </Text>
       </View>
     </View>
@@ -412,7 +302,11 @@ export default function ProfileScreen({ navigation }) {
               alignSelf: "center",
             }}
             onPress={() =>
-              navigation.navigate("Comment", { item, username, id })
+              navigation.navigate("Comment", {
+                item,
+                loggedInUsername,
+                loggedInId,
+              })
             }
           >
             <Icon
@@ -424,24 +318,20 @@ export default function ProfileScreen({ navigation }) {
               }}
             />
           </TouchableOpacity>
-
           <TouchableOpacity
-            onPress={() => deleteAlert(item._id)}
+            onPress={() => report(item._id)}
             style={{
-              alignItems: "flex-end",
-              alignSelf: "flex-end",
-              flex: 1,
               marginLeft: 100,
             }}
           >
-            <Icon name="md-trash" color={"#b51d25"} size={30} />
+            <Text style={{ color: "red", fontWeight: "700" }}>report</Text>
           </TouchableOpacity>
         </View>
       </View>
     </LinearGradient>
   );
 
-  const renderItem = ({ email, username, item }) => <MyPost item={item} />;
+  const renderItem = ({ item }) => <MyPost item={item} />;
 
   return (
     <View style={{ margin: 10 }}>
@@ -457,31 +347,8 @@ export default function ProfileScreen({ navigation }) {
           data={connections}
           ListHeaderComponent={
             <View>
-              <View style={{ marginBottom: 40, alignItems: "center" }}>
-                <Text style={styles.title}>Add a connection</Text>
-                <TextInput
-                  style={styles.flatListInput}
-                  onChangeText={(text) => setAddConnection(text)}
-                  value={addConnection}
-                />
-                <TouchableOpacity
-                  style={{ margin: 15 }}
-                  onPress={() => submitConnection(email, addConnection)}
-                >
-                  <LinearGradient
-                    start={[0, 0.5]}
-                    end={[1, 0.5]}
-                    colors={["#5f2c82", "#49a09d"]}
-                    style={{ borderRadius: 15 }}
-                  >
-                    <View style={styles.circleGradient}>
-                      <Text style={styles.visit}>SUBMIT</Text>
-                    </View>
-                  </LinearGradient>
-                </TouchableOpacity>
-              </View>
               <View style={{ alignItems: "center" }}>
-                <Text style={styles.title}>Your connections</Text>
+                <Text style={styles.title}>Connections</Text>
               </View>
             </View>
           }
@@ -500,14 +367,6 @@ export default function ProfileScreen({ navigation }) {
               >
                 <Text style={styles.greenItem}>{item.username}</Text>
               </LinearGradient>
-              <TouchableOpacity
-                style={styles.deleteTouchable}
-                onPress={() => deleteConnection(email, item.username)}
-              >
-                <Text style={{ color: "red", fontSize: 20, fontWeight: "700" }}>
-                  X
-                </Text>
-              </TouchableOpacity>
             </View>
           )}
           keyExtractor={(item) => item._id}
@@ -528,31 +387,8 @@ export default function ProfileScreen({ navigation }) {
           data={topics}
           ListHeaderComponent={
             <View>
-              <View style={{ marginBottom: 40, alignItems: "center" }}>
-                <Text style={styles.title}>Subscribe to a topic</Text>
-                <TextInput
-                  style={styles.flatListInput}
-                  onChangeText={(text) => setAddTopic(text)}
-                  value={addTopic}
-                />
-                <TouchableOpacity
-                  style={{ margin: 15 }}
-                  onPress={() => submitTopic(email, addTopic)}
-                >
-                  <LinearGradient
-                    start={[0, 0.5]}
-                    end={[1, 0.5]}
-                    colors={["#5f2c82", "#49a09d"]}
-                    style={{ borderRadius: 15 }}
-                  >
-                    <View style={styles.circleGradient}>
-                      <Text style={styles.visit}>SUBMIT</Text>
-                    </View>
-                  </LinearGradient>
-                </TouchableOpacity>
-              </View>
               <View style={{ alignItems: "center" }}>
-                <Text style={styles.title}>Your topics</Text>
+                <Text style={styles.title}>Topics</Text>
               </View>
             </View>
           }
@@ -577,14 +413,6 @@ export default function ProfileScreen({ navigation }) {
               >
                 <Text style={styles.greenItem}>{item}</Text>
               </LinearGradient>
-              <TouchableOpacity
-                style={styles.deleteItem}
-                onPress={() => deleteTopic(email, item)}
-              >
-                <Text style={{ color: "red", fontSize: 20, fontWeight: "700" }}>
-                  X
-                </Text>
-              </TouchableOpacity>
             </View>
           )}
           keyExtractor={(item) => item}
@@ -605,31 +433,8 @@ export default function ProfileScreen({ navigation }) {
           data={locations}
           ListHeaderComponent={
             <View>
-              <View style={{ marginBottom: 40, alignItems: "center" }}>
-                <Text style={styles.title}>Subscribe to a location</Text>
-                <TextInput
-                  style={styles.flatListInput}
-                  onChangeText={(text) => setAddLocation(text)}
-                  value={addLocation}
-                />
-                <TouchableOpacity
-                  style={{ margin: 15 }}
-                  onPress={() => submitLocation(email, addLocation)}
-                >
-                  <LinearGradient
-                    start={[0, 0.5]}
-                    end={[1, 0.5]}
-                    colors={["#5f2c82", "#49a09d"]}
-                    style={{ borderRadius: 15 }}
-                  >
-                    <View style={styles.circleGradient}>
-                      <Text style={styles.visit}>SUBMIT</Text>
-                    </View>
-                  </LinearGradient>
-                </TouchableOpacity>
-              </View>
               <View style={{ alignItems: "center" }}>
-                <Text style={styles.title}>Your locations</Text>
+                <Text style={styles.title}>Locations</Text>
               </View>
             </View>
           }
@@ -654,15 +459,6 @@ export default function ProfileScreen({ navigation }) {
               >
                 <Text style={styles.greenItem}>{item}</Text>
               </LinearGradient>
-
-              <TouchableOpacity
-                style={styles.deleteItem}
-                onPress={() => deleteLocation(email, item)}
-              >
-                <Text style={{ color: "red", fontSize: 20, fontWeight: "700" }}>
-                  X
-                </Text>
-              </TouchableOpacity>
             </View>
           )}
           keyExtractor={(item) => item}
@@ -693,18 +489,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 10,
   },
-  deleteItem: {
-    width: 30,
-    height: 30,
-    borderRadius: 50,
-    alignItems: "center",
-  },
-  delete: {
-    fontSize: 18,
-    margin: 5,
-    textAlign: "right",
-    color: "red",
-  },
+
   bigNumber: {
     fontSize: 40,
     marginBottom: 10,
@@ -777,12 +562,5 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     alignSelf: "center",
-  },
-
-  deleteTouchable: {
-    width: 30,
-    height: 30,
-    borderRadius: 50,
-    alignItems: "center",
   },
 });

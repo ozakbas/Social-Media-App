@@ -16,6 +16,7 @@ import * as Notifications from "expo-notifications";
 import * as Permissions from "expo-permissions";
 
 import { postRequest } from "../fetchComponents";
+import { getRequest } from "../fetchComponents";
 
 export default function SignInScreen() {
   const [email, setEmail] = useState();
@@ -24,14 +25,22 @@ export default function SignInScreen() {
 
   const { signIn } = React.useContext(AuthContext);
 
-  const storeEmail = async (email) => {
+  const storeInfo = async (email, username, id) => {
     try {
       await AsyncStorage.setItem("@logged_in_email", email);
+      await AsyncStorage.setItem("@logged_in_username", username);
+      await AsyncStorage.setItem("@logged_in_id", id);
     } catch (e) {
       // saving error
       console.log(e);
     }
   };
+
+  function getUserInfo(email) {
+    getRequest(email).then((result) => {
+      storeInfo(email, result.user.username, result.user._id);
+    });
+  }
 
   function handleSubmit(email, password, device_token) {
     var data = {
@@ -47,7 +56,7 @@ export default function SignInScreen() {
       ) {
         return Alert.alert(result.message);
       } else if (result.status == "success") {
-        storeEmail(email);
+        getUserInfo(email);
         return signIn({ email, password });
       }
     });

@@ -4,11 +4,15 @@ import { createMaterialBottomTabNavigator } from "@react-navigation/material-bot
 import Icon from "react-native-vector-icons/Ionicons";
 
 import HomeScreen from "./screens/HomeScreen";
+import SearchScreen from "./screens/SearchScreen";
+
 import ProfileScreen from "./screens/ProfileScreen";
 import ChatScreen from "./screens/ChatScreen";
 import NotificationScreen from "./screens/NotificationScreen";
 
 const Tab = createMaterialBottomTabNavigator();
+
+let a = 2;
 
 const Tabs = () => (
   <Tab.Navigator initialRouteName="Home" activeColor="#fff" shifting>
@@ -20,6 +24,17 @@ const Tabs = () => (
         tabBarColor: "#e2775e",
         tabBarIcon: ({ color }) => (
           <Icon name="ios-home" color={color} size={26} />
+        ),
+      }}
+    />
+    <Tab.Screen
+      name="Search"
+      component={SearchScreen}
+      options={{
+        tabBarLabel: "Search",
+        tabBarColor: "#8c1fcc",
+        tabBarIcon: ({ color }) => (
+          <Icon name="md-search" color={color} size={26} />
         ),
       }}
     />
@@ -38,6 +53,7 @@ const Tabs = () => (
       name="Notifications"
       component={NotificationScreen}
       options={{
+        tabBarBadge: a,
         tabBarLabel: "Notifications",
         tabBarColor: "#7ac44f",
         tabBarIcon: ({ color }) => (

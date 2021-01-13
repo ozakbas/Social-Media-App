@@ -12,8 +12,12 @@ import LoadingScreen from "./screens/LoadingScreen";
 import WelcomeScreen from "./screens/WelcomeScreen";
 import PostScreen from "./screens/PostScreen";
 import CommentScreen from "./screens/CommentScreen";
+import SinglePostScreen from "./screens/SinglePostScreen";
+import otherProfileScreen from "./screens/otherProfileScreen";
+
 import ConversationScreen from "./screens/ConversationScreen";
 import Tabs from "./Tabs";
+import { postRequest } from "./fetchComponents";
 
 const Stack = createStackNavigator();
 
@@ -86,26 +90,11 @@ export default function App() {
         dispatch({ type: "SIGN_IN", token: "dummy-auth-token" });
       },
       signOut: async (data) => {
-        let email = data.email;
-
-        var req = {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: email,
-          }),
+        var x = {
+          email: data.email,
         };
 
-        fetch("http://192.168.1.32:3000/mobile/resetDeviceToken", req)
-          .then((response) => response.text())
-          .then((result) => {
-            console.log(result);
-          })
-          .catch((error) => {
-            console.log("error", error);
-          });
+        postRequest(x, "resetDeviceToken", false);
 
         dispatch({ type: "SIGN_OUT" });
       },
@@ -136,6 +125,8 @@ export default function App() {
         return "My profile";
       case "Notifications":
         return "Notifications";
+      case "Search":
+        return "Search";
     }
   }
 
@@ -220,6 +211,28 @@ export default function App() {
                 component={ConversationScreen}
                 options={() => ({
                   headerTitle: "Conversation",
+                  headerStyle: { backgroundColor: "#1f65ff" },
+                  headerTintColor: "#fff",
+                  headerTitleAlign: "center",
+                  headerTitleStyle: { fontSize: 25 },
+                })}
+              />
+              <Stack.Screen
+                name="SinglePost"
+                component={SinglePostScreen}
+                options={() => ({
+                  headerTitle: "Post",
+                  headerStyle: { backgroundColor: "#1f65ff" },
+                  headerTintColor: "#fff",
+                  headerTitleAlign: "center",
+                  headerTitleStyle: { fontSize: 25 },
+                })}
+              />
+              <Stack.Screen
+                name="otherProfile"
+                component={otherProfileScreen}
+                options={() => ({
+                  headerTitle: "User profile",
                   headerStyle: { backgroundColor: "#1f65ff" },
                   headerTintColor: "#fff",
                   headerTitleAlign: "center",

@@ -12,6 +12,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "react-native-vector-icons/Ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import { postRequest } from "../fetchComponents";
+import { getRequest } from "../fetchComponents";
 
 export default function HomeScreen({ navigation }) {
   const [username, setUsername] = useState("");
@@ -31,21 +32,10 @@ export default function HomeScreen({ navigation }) {
   }
 
   function report(post_id) {
-    var req = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        postid: post_id,
-      }),
+    var data = {
+      postid: post_id,
     };
-    fetch("http://192.168.1.32:3000/mailSend", req)
-      .then((response) => response.text())
-      .then((result) => {
-        console.log(result);
-      })
-      .catch((error) => console.log("error", error));
+    postRequest(data, "mailSend", false);
   }
 
   function like(email, post_id, username) {
@@ -71,33 +61,22 @@ export default function HomeScreen({ navigation }) {
   }
 
   function getFeed(value) {
-    var req = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: value,
-      }),
+    var data = {
+      email: value,
     };
 
-    fetch("http://192.168.1.32:3000/mobile/getNewsfeed", req)
-      .then((response) => response.text())
-      .then((result) => JSON.parse(result))
-      .then((result) => {
-        setPosts(result.data);
-      })
-      .catch((error) => console.log("error", error));
+    postRequest(data, "getNewsfeed", true).then((result) => {
+      setPosts(result.data);
+    });
   }
 
   function getUserInfo(email) {
-    fetchUserInfo(email).then((result) => {
+    getRequest(email).then((result) => {
       setId(result.user._id);
       setUsername(result.user.username);
     });
   }
   const getData = async () => {
-    console.log("getdata workin");
     try {
       const value = await AsyncStorage.getItem("@logged_in_email");
       setEmail(value);
@@ -112,38 +91,6 @@ export default function HomeScreen({ navigation }) {
       console.log(e);
     }
   };
-
-  function fetchUserInfo(email) {
-    return new Promise((resolve, reject) => {
-      var data = {
-        email: email,
-      };
-
-      var req = {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        email: email,
-      };
-
-      fetch(
-        `http://192.168.1.32:3000/user/mobile/email/${encodeURIComponent(
-          data.email
-        )}`,
-        req
-      )
-        .then((response) => response.text())
-        .then((result) => JSON.parse(result))
-        .then((result) => {
-          resolve(result);
-        })
-        .catch((error) => {
-          console.log("error", error);
-          reject();
-        });
-    });
-  }
 
   useEffect(() => {
     getData();

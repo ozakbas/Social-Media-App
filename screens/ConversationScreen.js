@@ -11,6 +11,8 @@ import { ScrollView } from "react-native-gesture-handler";
 import io from "socket.io-client";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "react-native-vector-icons/Ionicons";
+import { getRequest } from "../fetchComponents";
+import { postRequest } from "../fetchComponents";
 
 export default class Conversation extends Component {
   constructor(props) {
@@ -24,40 +26,9 @@ export default class Conversation extends Component {
       person: this.props.route.params.item.person[0],
     };
   }
-  fetchUserInfo(email) {
-    return new Promise((resolve, reject) => {
-      var data = {
-        email: email,
-      };
-
-      var req = {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        email: email,
-      };
-
-      fetch(
-        `http://192.168.1.32:3000/user/mobile/email/${encodeURIComponent(
-          data.email
-        )}`,
-        req
-      )
-        .then((response) => response.text())
-        .then((result) => JSON.parse(result))
-        .then((result) => {
-          resolve(result);
-        })
-        .catch((error) => {
-          console.log("error", error);
-          reject();
-        });
-    });
-  }
 
   getUserInfo(email) {
-    this.fetchUserInfo(email).then((result) => {
+    getRequest(email).then((result) => {
       this.setState({ username: result.user.username });
     });
   }
@@ -115,24 +86,11 @@ export default class Conversation extends Component {
       this.state.chatMessage,
     ];
 
-    var req = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        messageObject: messageObject,
-      }),
+    var data = {
+      messageObject: messageObject,
     };
 
-    fetch("http://192.168.1.32:3000/mobile/sendMessage", req)
-      .then((response) => response.text())
-      .then((result) => JSON.parse(result))
-      .then((result) => {
-        console.log(result);
-      })
-
-      .catch((error) => console.log("error", error));
+    postRequest(data, "sendMessage", true);
 
     this.setState({ chatMessage: "" });
   }
