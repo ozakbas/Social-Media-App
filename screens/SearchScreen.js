@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { LinearGradient } from "expo-linear-gradient";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { postRequest } from "../fetchComponents";
 
 export default class SearchScreen extends Component {
@@ -21,10 +22,25 @@ export default class SearchScreen extends Component {
       users: [],
       locations: [],
       topics: [],
+      recommend: true,
+      recommendation_results: [],
     };
   }
 
+  getData = async () => {
+    const email = await AsyncStorage.getItem("@logged_in_email");
+    let data = { email: email };
+    postRequest(data, "getRecommendations", true).then((result) => {
+      this.setState({ recommendation_results: result.users });
+    });
+  };
+
+  componentDidMount() {
+    this.getData();
+  }
+
   search() {
+    this.setState({ recommend: false });
     var data = {
       query: this.state.query,
     };
@@ -44,6 +60,11 @@ export default class SearchScreen extends Component {
   }
 
   render() {
+    const mapRecommendations = this.state.recommendation_results.map((item) => (
+      <View style={styles.topic}>
+        <Text style={styles.itemText}>{item.username}</Text>
+      </View>
+    ));
     const mapTopics = this.state.topics.map((item) => (
       <View style={styles.topic}>
         <Text style={styles.itemText}>{item.topic}</Text>
@@ -97,6 +118,12 @@ export default class SearchScreen extends Component {
             <Icon name="md-search" color={"blue"} size={40} />
           </TouchableOpacity>
         </View>
+        {this.state.recommend && (
+          <View>
+            <Text style={styles.title}>Recommended users for you</Text>
+            <View>{mapRecommendations}</View>
+          </View>
+        )}
         <ScrollView horizontal={true}>
           <View style={{ flexDirection: "row" }}>{mapTopics}</View>
         </ScrollView>
@@ -106,6 +133,7 @@ export default class SearchScreen extends Component {
         {this.state.users.length != 0 && (
           <View>
             <Text style={styles.title}>Users</Text>
+
             {mapUsers}
           </View>
         )}
