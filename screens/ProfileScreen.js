@@ -170,6 +170,7 @@ export default function ProfileScreen({ navigation }) {
       const value = await AsyncStorage.getItem("@logged_in_email");
       setEmail(value);
       getUserInfo(value);
+      console.log(profileImage);
 
       if (value !== null) {
         // value previously stored
@@ -221,7 +222,7 @@ export default function ProfileScreen({ navigation }) {
         {profileImage != "" ? (
           <Image
             source={{
-              uri: `http://192.168.1.32:3000/${profileImage}`,
+              uri: `http://192.168.207.209:3000/${profileImage}`,
             }}
             style={{ width: 120, height: 120, borderRadius: 40 }}
           />
@@ -326,7 +327,7 @@ export default function ProfileScreen({ navigation }) {
 
         <Text
           style={{
-            fontSize: 20,
+            fontSize: 18,
             marginBottom: 10,
             fontWeight: "700",
             margin: 10,
@@ -339,7 +340,7 @@ export default function ProfileScreen({ navigation }) {
           {item.image != "" ? (
             <Image
               source={{
-                uri: `http://192.168.1.32:3000/${item.image}`,
+                uri: `http://192.168.207.209:3000/${item.image}`,
               }}
               style={{ width: 300, height: 300, alignSelf: "center" }}
             />

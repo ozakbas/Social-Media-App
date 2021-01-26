@@ -11,12 +11,13 @@ import Icon from "react-native-vector-icons/Ionicons";
 import { postRequest } from "../fetchComponents";
 
 export default function CommentScreen({ route, navigation }) {
-  const [id, setId] = useState(route.params.loggedInId);
+  const [id, setId] = useState(route.params.id);
   const [postId, setpostId] = useState(route.params.item._id);
-  const [username, setUsername] = useState(route.params.loggedInUsername);
+  const [username, setUsername] = useState(route.params.username);
   const [comment, setcomment] = useState("");
 
   const [commentArray, setcommentArray] = useState(route.params.item.comments);
+
   function sendNotif(message, username, postId) {
     var data = {
       message: message,
@@ -34,8 +35,8 @@ export default function CommentScreen({ route, navigation }) {
       comment: comment,
     };
     postRequest(data, "addComment", false).then((result) => {
-      sendNotif("commented on your post.", username, postId);
-      console.log(result);
+      //sendNotif("commented on your post.", username, postId);
+      console.log(username);
     });
     navigation.goBack();
   }

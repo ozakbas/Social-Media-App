@@ -140,7 +140,7 @@ export default function HomeScreen({ navigation }) {
           {item.image != "" ? (
             <Image
               source={{
-                uri: `http://192.168.1.32:3000/${item.image}`,
+                uri: `http://192.168.207.209:3000/${item.image}`,
               }}
               style={{ width: 300, height: 300, alignSelf: "center" }}
             />
@@ -296,13 +296,7 @@ const styles = StyleSheet.create({
   post: {
     backgroundColor: "grey",
   },
-  title: {
-    fontSize: 20,
-    marginBottom: 10,
-    fontWeight: "700",
-    color: "#393939",
-    margin: 10,
-  },
+
   username: {
     fontSize: 40,
     marginBottom: 10,
@@ -355,7 +349,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   title: {
-    fontSize: 20,
+    fontSize: 18,
     marginBottom: 10,
     fontWeight: "700",
     margin: 10,

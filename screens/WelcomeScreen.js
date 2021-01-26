@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  Image,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -20,7 +21,11 @@ export default function WelcomeScreen({ navigation }) {
           alignContent: "center",
         }}
       >
-        <Text style={styles.title}>Welcome to the Social Media App!</Text>
+        <Image
+          source={require("../assets/logo.png")}
+          style={{ width: 120, height: 120, borderRadius: 40 }}
+        />
+        <Text style={styles.title}>CENTROID</Text>
         <View style={styles.buttonView}>
           <TouchableOpacity onPress={() => navigation.navigate("SignIn")}>
             <Text style={{ fontSize: 20, fontWeight: "700", color: "#fefefe" }}>

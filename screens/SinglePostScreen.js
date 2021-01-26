@@ -127,7 +127,7 @@ export default class SinglePostScreen extends Component {
               {post.image != "" ? (
                 <Image
                   source={{
-                    uri: `http://192.168.1.32:3000/${post.image}`,
+                    uri: `http://192.168.207.209:3000/${post.image}`,
                   }}
                   style={{ width: 300, height: 300, alignSelf: "center" }}
                 />

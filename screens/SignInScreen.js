@@ -35,7 +35,7 @@ export default function SignInScreen() {
       console.log(e);
     }
   };
-
+ 
   function getUserInfo(email) {
     getRequest(email).then((result) => {
       storeInfo(email, result.user.username, result.user._id);
@@ -86,6 +86,7 @@ export default function SignInScreen() {
       set_device_token(token);
     } else {
       alert("Must use physical device for Push Notifications");
+      set_device_token("");
     }
 
     if (Platform.OS === "android") {

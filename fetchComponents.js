@@ -8,7 +8,7 @@ export function postRequest(data, endpoint, parse) {
       body: JSON.stringify(data),
     };
 
-    var myUrl = `http://192.168.1.32:3000/mobile/${endpoint}`;
+    var myUrl = `http://192.168.207.209:3000/mobile/${endpoint}`;
     if (parse) {
       fetch(myUrl, req)
         .then((response) => response.text())
@@ -48,7 +48,7 @@ export function getRequest(email) {
     };
 
     fetch(
-      `http://192.168.1.32:3000/user/mobile/email/${encodeURIComponent(
+      `http://192.168.207.209:3000/user/mobile/email/${encodeURIComponent(
         data.email
       )}`,
       req
@@ -79,7 +79,9 @@ export function getPost(postId) {
     };
 
     fetch(
-      `http://192.168.1.32:3000/mobile/post/${encodeURIComponent(data.postId)}`,
+      `http://192.168.207.209:3000/mobile/post/${encodeURIComponent(
+        data.postId
+      )}`,
       req
     )
       .then((response) => response.text())

@@ -53,7 +53,6 @@ const Tabs = () => (
       name="Notifications"
       component={NotificationScreen}
       options={{
-        tabBarBadge: a,
         tabBarLabel: "Notifications",
         tabBarColor: "#7ac44f",
         tabBarIcon: ({ color }) => (

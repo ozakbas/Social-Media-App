@@ -127,7 +127,7 @@ export default function otherProfileScreen({ route, navigation }) {
         {profileImage != "" ? (
           <Image
             source={{
-              uri: `http://192.168.1.32:3000/${profileImage}`,
+              uri: `http://192.168.207.209:3000/${profileImage}`,
             }}
             style={{ width: 120, height: 120, borderRadius: 40 }}
           />
@@ -163,6 +163,23 @@ export default function otherProfileScreen({ route, navigation }) {
           <Text style={styles.bigNumber}>{locations.length}</Text>
           <Text>followed</Text>
           <Text>locations</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View
+        style={{
+          margin: 20,
+          alignItems: "center",
+          borderRadius: 15,
+          borderColor: "#B39E8D",
+          borderWidth: 3,
+          padding: 5,
+        }}
+      >
+        <TouchableOpacity onPress={() => navigate.back()}>
+          <Text style={{ fontSize: 15, fontWeight: "700", color: "#393939" }}>
+            ADD TO YOUR CONNECTIONS
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -229,7 +246,7 @@ export default function otherProfileScreen({ route, navigation }) {
           {item.image != "" ? (
             <Image
               source={{
-                uri: `http://192.168.1.32:3000/${item.image}`,
+                uri: `http://192.168.207.209:3000/${item.image}`,
               }}
               style={{ width: 300, height: 300, alignSelf: "center" }}
             />

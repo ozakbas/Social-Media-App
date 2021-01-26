@@ -53,7 +53,7 @@ export default class Conversation extends Component {
       headerTitle: this.state.person,
     });
 
-    this.socket = io("http://192.168.1.32:3000", {
+    this.socket = io("http://192.168.207.209:3000", {
       query: `roomId=${this.state.chatId}`,
     });
 
